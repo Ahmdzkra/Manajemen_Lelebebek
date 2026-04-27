@@ -1,50 +1,60 @@
 import PrimaryButton from '@/Components/PrimaryButton';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
+import AuthLayout from '@/Layouts/AuthLayout';
 
 export default function VerifyEmail({ status }) {
     const { post, processing } = useForm({});
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('verification.send'));
     };
 
     return (
-        <GuestLayout>
-            <Head title="Email Verification" />
+        <AuthLayout 
+            title="Verifikasi Email" 
+            subtitle="Cek email kamu untuk melanjutkan"
+        >
 
-            <div className="mb-4 text-sm text-gray-600">
-                Thanks for signing up! Before getting started, could you verify
-                your email address by clicking on the link we just emailed to
-                you? If you didn't receive the email, we will gladly send you
-                another.
-            </div>
+            {/* INFO */}
+            <p className="text-sm text-gray-200 text-center mb-6">
+                Kami telah mengirim link verifikasi ke email kamu. 
+                Silakan cek inbox (atau spam) dan klik link tersebut.
+            </p>
 
+            {/* STATUS */}
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+                <div className="mb-4 text-sm text-green-300 text-center">
+                    Link verifikasi baru sudah dikirim ✔️
                 </div>
             )}
 
             <form onSubmit={submit}>
-                <div className="mt-4 flex items-center justify-between">
-                    <PrimaryButton disabled={processing}>
-                        Resend Verification Email
-                    </PrimaryButton>
 
+                {/* BUTTON */}
+                <div className="mt-4">
+                    <PrimaryButton
+                        className="w-full justify-center bg-white text-indigo-600"
+                        disabled={processing}
+                    >
+                        Kirim Ulang Email Verifikasi
+                    </PrimaryButton>
+                </div>
+
+                {/* LOGOUT */}
+                <div className="mt-4 text-center">
                     <Link
                         href={route('logout')}
                         method="post"
                         as="button"
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="text-sm text-white underline hover:text-gray-200"
                     >
                         Log Out
                     </Link>
                 </div>
+
             </form>
-        </GuestLayout>
+
+        </AuthLayout>
     );
 }
