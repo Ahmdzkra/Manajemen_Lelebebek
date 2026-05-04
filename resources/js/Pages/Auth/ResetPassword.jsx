@@ -1,14 +1,8 @@
 import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/react';
-
-import { useState, useMemo } from 'react';
-import { Eye, EyeOff, Mail } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-import AuthLayout from '@/Layouts/AuthLayout';
+import GuestLayout from '@/Layouts/GuestLayout';
+import { Head, useForm, Link } from '@inertiajs/react';
+import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 
 export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -19,7 +13,7 @@ export default function ResetPassword({ token, email }) {
     });
 
     const [showPassword, setShowPassword] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const submit = (e) => {
         e.preventDefault();
@@ -49,121 +43,103 @@ export default function ResetPassword({ token, email }) {
     }, [data.password]);
 
     return (
-        <AuthLayout 
-            title="Reset Password" 
-            subtitle="Buat password baru"
-        >
+        <GuestLayout title="Reset Password" subtitle="Choose a strong new password">
+            <Head title="Reset Password" />
 
-            <form onSubmit={submit}>
-
-                {/* EMAIL */}
+            <form onSubmit={submit} className="space-y-5">
+                {/* Email Field (Disabled) */}
                 <div>
-                    <InputLabel value="Email" className="text-white" />
-
-                    <div className="relative">
-                        <TextInput
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
+                    <div className="relative group opacity-60">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors">
+                            <Mail className="w-5 h-5" />
+                        </div>
+                        <input
+                            id="email"
                             type="email"
+                            name="email"
                             value={data.email}
-                            className="mt-1 block w-full rounded-lg bg-white/80 pl-10"
-                            onChange={(e) => setData('email', e.target.value)}
+                            className="block w-full pl-11 pr-4 py-3.5 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white outline-none cursor-not-allowed"
+                            autoComplete="username"
+                            readOnly
                         />
-
-                        <Mail className="absolute left-3 top-3 text-gray-500" size={18} />
                     </div>
-
-                    <InputError message={errors.email} className="mt-2 text-red-300" />
+                    <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                {/* PASSWORD */}
-                <div className="mt-4">
-                    <InputLabel value="Password" className="text-white" />
-
-                    <div className="relative">
-                        <TextInput
-                            type={showPassword ? 'text' : 'password'}
+                {/* Password Field */}
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">New Password</label>
+                    <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors">
+                            <Lock className="w-5 h-5" />
+                        </div>
+                        <input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            name="password"
                             value={data.password}
-                            className="mt-1 block w-full rounded-lg bg-white/80 pr-10"
+                            className="block w-full pl-11 pr-12 py-3.5 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 outline-none backdrop-blur-md"
+                            placeholder="••••••••"
+                            autoComplete="new-password"
+                            autoFocus
                             onChange={(e) => setData('password', e.target.value)}
                         />
-
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-3 text-gray-500 hover:text-indigo-600"
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
                         >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                     </div>
-
-                    <InputError message={errors.password} className="mt-2 text-red-300" />
-
-                    {/* STRENGTH */}
-                    {data.password && (
-                        <div className="mt-2">
-                            <div className="w-full h-2 bg-gray-300 rounded">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: strength.width }}
-                                    className={`h-2 rounded ${strength.color}`}
-                                />
-                            </div>
-                            <p className="text-xs text-white mt-1">
-                                Strength: {strength.label}
-                            </p>
-                        </div>
-                    )}
+                    <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                {/* CONFIRM PASSWORD */}
-                <div className="mt-4">
-                    <InputLabel value="Confirm Password" className="text-white" />
-
-                    <div className="relative">
-                        <TextInput
-                            type={showConfirm ? 'text' : 'password'}
+                {/* Confirm Password Field */}
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Confirm New Password</label>
+                    <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors">
+                            <Lock className="w-5 h-5" />
+                        </div>
+                        <input
+                            id="password_confirmation"
+                            type={showConfirmPassword ? "text" : "password"}
+                            name="password_confirmation"
                             value={data.password_confirmation}
-                            className="mt-1 block w-full rounded-lg bg-white/80 pr-10"
-                            onChange={(e) =>
-                                setData('password_confirmation', e.target.value)
-                            }
+                            className="block w-full pl-11 pr-12 py-3.5 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 outline-none backdrop-blur-md"
+                            placeholder="••••••••"
+                            autoComplete="new-password"
+                            onChange={(e) => setData('password_confirmation', e.target.value)}
                         />
-
                         <button
                             type="button"
-                            onClick={() => setShowConfirm(!showConfirm)}
-                            className="absolute right-3 top-3 text-gray-500 hover:text-indigo-600"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
                         >
-                            {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                     </div>
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2 text-red-300"
-                    />
-
-                    {/* MATCH */}
-                    {data.password_confirmation && (
-                        <p className={`text-sm mt-1 ${
-                            data.password === data.password_confirmation
-                                ? 'text-green-300'
-                                : 'text-red-300'
-                        }`}>
-                            {data.password === data.password_confirmation
-                                ? 'Password cocok ✔️'
-                                : 'Password tidak sama ❌'}
-                        </p>
-                    )}
+                    <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
 
-                {/* BUTTON */}
-                <div className="mt-6">
-                    <PrimaryButton
-                        className="w-full justify-center bg-white text-indigo-600"
+                {/* Submit Button */}
+                <div className="pt-4">
+                    <button
+                        type="submit"
                         disabled={processing}
+                        className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-bold text-lg transition-all duration-300 shadow-[0_0_40px_-10px_rgba(79,70,229,0.5)] hover:shadow-[0_0_60px_-15px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
-                        Reset Password
-                    </PrimaryButton>
+                        {processing ? (
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                        ) : (
+                            <>
+                                Reset Password
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </>
+                        )}
+                    </button>
                 </div>
 
             </form>
