@@ -1,3 +1,62 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    html, body {
+        @apply transition-colors duration-500 ease-in-out;
+    }
+    
+    /* Ensure common containers also transition smoothly */
+    .dark-transition {
+        @apply transition-all duration-500 ease-in-out;
+    }
+
+    /* Standardizing Date Picker & UI Icons */
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        @apply cursor-pointer transition-all;
+    }
+
+    /* Aggressively Hide Default Select Arrows */
+    select {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        background-image: none !important;
+    }
+
+    select::-ms-expand {
+        display: none !important;
+    }
+
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="time"],
+    input[type="number"] {
+        /* color-scheme handled by :root/.dark classes */
+    }
+
+    .icon-theme {
+        @apply text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        75% { transform: translateX(4px); }
+    }
+
+    .animate-shake {
+        animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+    }
+}
+
+:root {
+    color-scheme: light;
+}
+
+.dark {
+    color-scheme: dark;
+}

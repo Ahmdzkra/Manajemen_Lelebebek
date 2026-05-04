@@ -1,13 +1,8 @@
-import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Link, useForm } from '@inertiajs/react';
-import { useState, useMemo } from 'react';
-import { Eye, EyeOff, Mail } from 'lucide-react';
-import { motion } from 'framer-motion';
-import AuthLayout from '@/Layouts/AuthLayout';
+import GuestLayout from '@/Layouts/GuestLayout';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -45,109 +40,119 @@ export default function Login({ status, canResetPassword }) {
     }, [data.password]);
 
     return (
-        <AuthLayout title="Login" subtitle="Masuk ke sistem">
+        <GuestLayout title="Selamat Datang Kembali" subtitle="Silahkan login untuk melanjutkan">
+            <Head title="Log in" />
 
             {status && (
-                <div className="mb-4 text-sm text-green-300 text-center">
+                <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-sm font-medium text-emerald-600 dark:text-emerald-400 text-center">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit}>
-
-                {/* EMAIL */}
+            <form onSubmit={submit} className="space-y-5">
+                {/* Email Field */}
                 <div>
-                    <InputLabel value="Email" className="text-white" />
-
-                    <div className="relative">
-                        <TextInput
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Alamat Email</label>
+                    <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors">
+                            <Mail className="w-5 h-5" />
+                        </div>
+                        <input
+                            id="email"
                             type="email"
+                            name="email"
                             value={data.email}
-                            className="mt-1 block w-full rounded-lg bg-white/80 border-none focus:ring-2 focus:ring-indigo-400 pl-10"
+                            className="block w-full pl-11 pr-4 py-3.5 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 outline-none backdrop-blur-md"
+                            placeholder="hello@gmail.com"
+                            autoComplete="username"
+                            autoFocus
                             onChange={(e) => setData('email', e.target.value)}
                         />
-
-                        <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="absolute inset-y-0 left-3 flex items-center text-gray-500"
-                        >
-                            <Mail size={18} />
-                        </motion.div>
                     </div>
-
-                    <InputError message={errors.email} className="mt-2 text-red-300" />
+                    <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                {/* PASSWORD */}
-                <div className="mt-4">
-                    <InputLabel value="Password" className="text-white" />
-
-                    <div className="relative">
-                        <TextInput
-                            type={showPassword ? 'text' : 'password'}
+                {/* Password Field */}
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Password</label>
+                    <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors">
+                            <Lock className="w-5 h-5" />
+                        </div>
+                        <input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            name="password"
                             value={data.password}
-                            className="mt-1 block w-full rounded-lg bg-white/80 border-none focus:ring-2 focus:ring-indigo-400 pr-10"
+                            className="block w-full pl-11 pr-12 py-3.5 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 outline-none backdrop-blur-md"
+                            placeholder="••••••••"
+                            autoComplete="current-password"
                             onChange={(e) => setData('password', e.target.value)}
                         />
-
-                        <motion.button
+                        <button
                             type="button"
-                            whileTap={{ scale: 0.85 }}
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-indigo-600"
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
                         >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </motion.button>
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
                     </div>
-
-                    <InputError message={errors.password} className="mt-2 text-red-300" />
-
-                    {/* STRENGTH */}
-                    {data.password && (
-                        <div className="mt-2">
-                            <div className="w-full h-2 bg-gray-300 rounded">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: strength.width }}
-                                    className={`h-2 rounded ${strength.color}`}
-                                />
-                            </div>
-                            <p className="text-xs text-white mt-1">
-                                Strength: {strength.label}
-                            </p>
-                        </div>
-                    )}
+                    <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                {/* REMEMBER */}
-                <div className="mt-4 flex items-center justify-between">
-                    <label className="flex items-center text-sm text-white">
-                        <Checkbox
-                            checked={data.remember}
-                            onChange={(e) => setData('remember', e.target.checked)}
-                        />
-                        <span className="ml-2">Remember me</span>
+                {/* Remember Me & Forgot Password */}
+                <div className="flex items-center justify-between pt-2">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                        <div className="relative flex items-center justify-center">
+                            <input
+                                type="checkbox"
+                                name="remember"
+                                checked={data.remember}
+                                onChange={(e) => setData('remember', e.target.checked)}
+                                className="peer appearance-none w-5 h-5 border border-slate-300 dark:border-white/20 rounded bg-white dark:bg-white/5 checked:bg-indigo-500 checked:border-indigo-500 transition-all cursor-pointer"
+                            />
+                            <svg className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 14 14" fill="none">
+                                <path d="M2 7L5.5 10.5L12 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </div>
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">
+                            Ingat Saya
+                        </span>
                     </label>
 
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="text-sm text-white underline"
+                            className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
                         >
-                            Forgot Password?
+                            Lupa Password?
                         </Link>
                     )}
                 </div>
 
-                {/* BUTTON */}
-                <div className="mt-6">
-                    <PrimaryButton
-                        className="w-full justify-center bg-white text-indigo-600"
+                {/* Submit Button */}
+                <div className="pt-4">
+                    <button
+                        type="submit"
                         disabled={processing}
+                        className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-bold text-lg transition-all duration-300 shadow-[0_0_40px_-10px_rgba(79,70,229,0.5)] hover:shadow-[0_0_60px_-15px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
-                        Log In
-                    </PrimaryButton>
+                        {processing ? (
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                        ) : (
+                            <>
+                                Sign In
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </>
+                        )}
+                    </button>
+                </div>
+
+                <div className="text-center mt-6">
+                    <span className="text-slate-600 dark:text-slate-400 text-sm">Belum Punya Akun? </span>
+                    <Link href={route('register')} className="text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors">
+                        Buat Akun
+                    </Link>
                 </div>
 
                 {/* REGISTER */}
