@@ -20,7 +20,9 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $period = $request->get('period', '7days');
+        $period = $request->input('period', '7days');
+        $start = $request->input('start');
+        $end = $request->input('end');
 
         return Inertia::render('Dashboard', [
             'role' => $user?->role,
@@ -28,15 +30,17 @@ class DashboardController extends Controller
             'latestSales' => $this->getLatestSales(),
             'latestReturns' => ReturnItem::with('product', 'supplier')->latest()->take(5)->get(),
             'latestOpname' => StockOpname::with('product')->latest()->first(),
-            'chartData' => $this->getChartData($period),
+            'chartData' => $this->getChartData($period, $start, $end),
             'currentPeriod' => $period,
+            'currentStart' => $start,
+            'currentEnd' => $end,
         ]);
     }
 
     private function getStats()
     {
         return [
-            'products' => Product::count(),
+            'products' => Product::sum('stock'),
             'suppliers' => Supplier::count(),
             'users' => User::count(),
             'sales_today' => (float) (Sale::whereDate('created_at', today())->sum('total') + Transaction::whereDate('created_at', today())->sum('total')),
@@ -49,29 +53,48 @@ class DashboardController extends Controller
 
     private function getLatestSales()
     {
-        return collect()
-            ->concat(Transaction::latest()->take(5)->get()->map(fn($t) => [
-                'id' => 'T'.$t->id,
-                'name' => $t->invoice_no,
-                'qty' => (int) $t->details()->sum('qty'),
-                'total' => (float) $t->total,
-                'created_at' => $t->created_at
-            ]))
-            ->concat(Sale::with('product')->latest()->take(5)->get()->map(fn($s) => [
-                'id' => 'S'.$s->id,
-                'name' => $s->product?->name ?? 'Produk',
-                'qty' => (int) $s->qty,
-                'total' => (float) $s->total,
-                'created_at' => $s->created_at
-            ]))
+        // Ambil semua data Transactions dengan detail produk
+        $transactions = Transaction::with('details.product')->latest()->get()->flatMap(function($t) {
+            if ($t->details->isEmpty()) {
+                return [[
+                    'id'           => 'T'.$t->id,
+                    'invoice_no'   => $t->invoice_no,
+                    'product_name' => '-',
+                    'qty'          => 0,
+                    'total'        => (float) $t->total,
+                    'created_at'   => $t->created_at,
+                ]];
+            }
+            return $t->details->map(fn($d) => [
+                'id'           => 'T'.$t->id.'-D'.$d->id,
+                'invoice_no'   => $t->invoice_no,
+                'product_name' => $d->product?->name ?? '-',
+                'qty'          => (int) $d->qty,
+                'total'        => (float) $d->subtotal,
+                'created_at'   => $t->created_at,
+            ]);
+        });
+
+        // Ambil semua data Sales langsung
+        $sales = Sale::with('product')->latest()->get()->map(fn($s) => [
+            'id'           => 'S'.$s->id,
+            'invoice_no'   => 'S-'.$s->id,
+            'product_name' => $s->product?->name ?? '-',
+            'qty'          => (int) $s->qty,
+            'total'        => (float) $s->total,
+            'created_at'   => $s->created_at,
+        ]);
+
+        return $transactions
+            ->concat($sales)
             ->sortByDesc('created_at')
-            ->take(5)
             ->values();
     }
 
-    private function getChartData(string $period): array
+    private function getChartData(string $period, ?string $start = null, ?string $end = null): array
     {
         return match ($period) {
+            'custom_month' => $this->getCustomMonthData($start, $end),
             '7days'   => $this->getDailyData(7),
             '14days'  => $this->getDailyData(14),
             '30days'  => $this->getDailyData(30),
@@ -157,6 +180,38 @@ class DashboardController extends Controller
                 ),
             ];
         })->filter()->values()->toArray();
+    }
+
+    private function getCustomMonthData(?string $start, ?string $end): array
+    {
+        if (!$start || !$end) return $this->getDailyData(7);
+
+        try {
+            $startDate = Carbon::createFromFormat('Y-m', $start)->startOfMonth();
+            $endDate = Carbon::createFromFormat('Y-m', $end)->endOfMonth();
+        } catch (\Exception $e) {
+            return $this->getDailyData(7);
+        }
+
+        $data = [];
+        $currentDate = clone $startDate;
+
+        while ($currentDate <= $endDate) {
+            $year = $currentDate->year;
+            $month = $currentDate->month;
+
+            $data[] = [
+                'date' => $currentDate->translatedFormat('M Y'),
+                'sales' => (float) (
+                    Transaction::whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('total')
+                    + Sale::whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('total')
+                ),
+            ];
+
+            $currentDate->addMonth();
+        }
+
+        return $data;
     }
 }
 

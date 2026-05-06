@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('suppliers', SupplierController::class)->except(['show']);
-    Route::patch('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::resource('users', UserController::class)->except(['show']);
 
     Route::resource('receivings', ReceivingController::class)->only(['index', 'store']);
