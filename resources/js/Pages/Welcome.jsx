@@ -28,7 +28,7 @@ export default function Welcome({ auth }) {
 
     return (
         <>
-            <Head title="LeleBek - Segar dari Alam" />
+            <Head title="Welcome" />
 
             <div className="h-screen overflow-hidden bg-[#FDFBF7] dark:bg-slate-950 text-[#1B2A22] dark:text-slate-100 font-sans selection:bg-[#789454] selection:text-white relative flex flex-col transition-all duration-500 ease-in-out">
 

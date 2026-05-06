@@ -59,7 +59,7 @@ export default function AuthenticatedLayout({ user, children }) {
     if (!user) return null;
 
     const MenuItem = ({ href, icon: Icon, children }) => {
-        const isActive = url === href || url.startsWith(href + "/");
+        const isActive = url === href || url.startsWith(href + "/") || url.startsWith(href + "?");
         return (
             <Link
                 href={href}

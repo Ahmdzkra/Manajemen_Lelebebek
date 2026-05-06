@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -52,7 +52,7 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => $validated['role'],
+            'role' => 'cashier',
         ]);
 
         return back()->with('success', 'User berhasil ditambahkan.');
@@ -76,20 +76,6 @@ class UserController extends Controller
         $user->update($validated);
 
         return back()->with('success', 'User berhasil diperbarui.');
-    }
-
-    public function resetPassword(User $user)
-    {
-        $newPassword = Str::password(12);
-
-        $user->update([
-            'password' => Hash::make($newPassword),
-        ]);
-
-        return back()->with(
-            'success',
-            'Password baru user: ' . $newPassword
-        );
     }
 
     public function destroy(User $user)
