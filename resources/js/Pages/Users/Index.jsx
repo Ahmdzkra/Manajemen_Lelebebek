@@ -6,7 +6,7 @@ import { Search, Plus, Edit2, Trash2, Users, X, Shield, Mail, User } from "lucid
 import Card from '@/Components/UI/Card';
 import Button from '@/Components/UI/Button';
 import Input from '@/Components/UI/Input';
-import Select from '@/Components/UI/Select';
+
 import Badge from '@/Components/UI/Badge';
 import PageHeader from '@/Components/UI/PageHeader';
 import ConfirmModal from '@/Components/UI/ConfirmModal';
@@ -19,7 +19,6 @@ export default function Index({ auth, users, filters }) {
         name: '',
         email: '',
         password: '',
-        role: 'cashier',
     });
 
     const submit = (e) => {
@@ -44,7 +43,6 @@ export default function Index({ auth, users, filters }) {
             name: item.name,
             email: item.email,
             password: '',
-            role: item.role,
         });
     };
 
@@ -62,9 +60,9 @@ export default function Index({ auth, users, filters }) {
             <div className="max-w-7xl mx-auto space-y-6">
                 <PageHeader 
                     title="Manajemen User" 
-                    subtitle="Kelola akun pengguna dan hak akses sistem."
+                    subtitle="Kelola akun pengguna sistem."
                     badge="Pengaturan Sistem"
-                    icon={Shield}
+                    icon={Users}
                 >
                     <Input 
                         icon={Search} 
@@ -82,7 +80,7 @@ export default function Index({ auth, users, filters }) {
                         </Badge>
                     </div>
 
-                    <form onSubmit={submit} className="grid md:grid-cols-5 gap-4">
+                    <form onSubmit={submit} className="grid md:grid-cols-4 gap-4">
                         <Input 
                             label="Nama Lengkap"
                             icon={User}
@@ -111,19 +109,7 @@ export default function Index({ auth, users, filters }) {
                             error={errors.password}
                             required={!editId}
                         />
-                        <Select 
-                            label="Role / Akses"
-                            icon={Shield}
-                            value={data.role}
-                            onChange={(e) => setData('role', e.target.value)}
-                            options={[
-                                { label: 'Admin', value: 'admin' },
-                                { label: 'Kasir', value: 'cashier' }
-                            ]}
-                            error={errors.role}
-                            placeholder={null}
-                            required
-                        />
+
                         <div className="flex items-end gap-2">
                             <Button 
                                 type="submit" 
@@ -149,6 +135,7 @@ export default function Index({ auth, users, filters }) {
                                 <tr>
                                     <th className="px-6 py-4 text-center font-semibold w-16">No</th>
                                     <th className="px-6 py-4 text-left font-semibold">User</th>
+
                                     <th className="px-6 py-4 text-center font-semibold">Role</th>
                                     <th className="px-6 py-4 text-center font-semibold">Terdaftar</th>
                                     <th className="px-6 py-4 text-center font-semibold">Aksi</th>
@@ -168,6 +155,7 @@ export default function Index({ auth, users, filters }) {
                                                 </span>
                                             </div>
                                         </td>
+
                                         <td className="px-6 py-4 text-center">
                                             <Badge variant={item.role === 'admin' ? 'info' : 'slate'} icon={Shield}>
                                                 {item.role === 'admin' ? 'Administrator' : 'Kasir'}
@@ -181,13 +169,7 @@ export default function Index({ auth, users, filters }) {
                                                 <button onClick={() => editData(item)} title="Edit User" className="p-2 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors">
                                                     <Edit2 className="w-4 h-4" />
                                                 </button>
-                                                <button 
-                                                    onClick={() => router.patch(`/users/${item.id}/reset-password`)} 
-                                                    title="Reset Password"
-                                                    className="p-2 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors"
-                                                >
-                                                    <Shield className="w-4 h-4" />
-                                                </button>
+
                                                 {item.id !== auth.user.id && (
                                                     <button onClick={() => setDeleteItem(item)} className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors">
                                                         <Trash2 className="w-4 h-4" />
