@@ -76,7 +76,9 @@ export default function ConfirmPassword() {
                         )}
                     </button>
                 </div>
+
             </form>
-        </GuestLayout>
+
+        </AuthLayout>
     );
 }

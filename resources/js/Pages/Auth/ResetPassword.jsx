@@ -23,6 +23,25 @@ export default function ResetPassword({ token, email }) {
         });
     };
 
+    // 🔐 Strength
+    const strength = useMemo(() => {
+        const p = data.password || '';
+        let score = 0;
+        if (p.length >= 8) score++;
+        if (/[A-Z]/.test(p)) score++;
+        if (/[0-9]/.test(p)) score++;
+        if (/[^A-Za-z0-9]/.test(p)) score++;
+
+        const map = [
+            { label: 'Weak', color: 'bg-red-400', width: '25%' },
+            { label: 'Fair', color: 'bg-yellow-400', width: '50%' },
+            { label: 'Good', color: 'bg-blue-400', width: '75%' },
+            { label: 'Strong', color: 'bg-green-400', width: '100%' },
+        ];
+
+        return map[score - 1] || { label: '', color: 'bg-gray-300', width: '0%' };
+    }, [data.password]);
+
     return (
         <GuestLayout title="Reset Password" subtitle="Choose a strong new password">
             <Head title="Reset Password" />
@@ -122,7 +141,9 @@ export default function ResetPassword({ token, email }) {
                         )}
                     </button>
                 </div>
+
             </form>
-        </GuestLayout>
+
+        </AuthLayout>
     );
 }
