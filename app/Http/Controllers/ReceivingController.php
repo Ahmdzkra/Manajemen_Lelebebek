@@ -14,7 +14,7 @@ class ReceivingController extends Controller
     public function index()
     {
         return Inertia::render('Receivings/Index', [
-            'products' => Product::orderBy('name')->get(),
+            'products' => Product::with('latestReceiving')->orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
             'receivings' => Receiving::with('product', 'supplier')
                 ->latest()

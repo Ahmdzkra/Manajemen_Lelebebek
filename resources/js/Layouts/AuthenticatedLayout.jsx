@@ -18,18 +18,27 @@ import {
     Bell,
     Menu,
     X,
-    ChevronDown
+    ChevronDown,
+    Activity
 } from "lucide-react";
 
 export default function AuthenticatedLayout({ user, children }) {
-    const { url } = usePage();
+    const { url, props } = usePage();
     const role = user?.role ?? null;
+
+    // Ambil data notifikasi stok yang menipis
+    const notifications = props.notifications || { low_stock_count: 0, low_stock_products: [] };
+    const lowStockCount = notifications.low_stock_count;
+    const lowStockProducts = notifications.low_stock_products;
 
     // Responsive Sidebar State
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Profile Dropdown State
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+    // Notification Dropdown State
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
     // Dark mode state
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -49,6 +58,9 @@ export default function AuthenticatedLayout({ user, children }) {
             localStorage.setItem("theme", "light");
         }
     }, [isDarkMode]);
+
+    const isProductsActive = url.startsWith('/products') || url.startsWith('/master-products');
+    const [isProductsOpen, setIsProductsOpen] = useState(isProductsActive);
 
     // Close sidebar on route change on mobile
     useEffect(() => {
@@ -83,6 +95,54 @@ export default function AuthenticatedLayout({ user, children }) {
                 {isActive && (
                     <div className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></div>
                 )}
+            </Link>
+        );
+    };
+
+    const MenuDropdown = ({ icon: Icon, title, isOpen, onToggle, children, isActive }) => {
+        return (
+            <div className="space-y-1">
+                <button
+                    onClick={onToggle}
+                    className={`w-full group flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 text-sm font-semibold ${isActive
+                        ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-sm shadow-indigo-100/50 dark:shadow-none ring-1 ring-indigo-200/50 dark:ring-indigo-500/20"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-indigo-600 dark:hover:text-indigo-400 hover:shadow-sm"
+                        }`}
+                >
+                    <div className={`relative flex items-center justify-center transition-all duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110 group-hover:-translate-y-0.5'}`}>
+                        {isActive && (
+                            <div className="absolute inset-0 bg-indigo-400 dark:bg-indigo-500 blur-md opacity-20 rounded-full"></div>
+                        )}
+                        <Icon
+                            className={`w-5 h-5 relative z-10 transition-colors duration-300 ${isActive
+                                ? "text-indigo-600 dark:text-indigo-400"
+                                : "text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400"
+                                }`}
+                        />
+                    </div>
+                    <span>{title}</span>
+                    <ChevronDown className={`ml-auto w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-40 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                    <div className="pl-12 pr-4 py-1.5 space-y-1.5 border-l-2 border-slate-100 dark:border-slate-800 ml-6">
+                        {children}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const SubMenuItem = ({ href, children }) => {
+        const isActive = url === href || url.startsWith(href + "/") || url.startsWith(href + "?");
+        return (
+            <Link
+                href={href}
+                className={`block w-full text-sm font-medium py-2 px-3 rounded-xl transition-all duration-200 ${isActive
+                    ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-500/5"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    }`}
+            >
+                {children}
             </Link>
         );
     };
@@ -140,9 +200,17 @@ export default function AuthenticatedLayout({ user, children }) {
                                     <MenuItem href="/dashboard" icon={LayoutDashboard}>
                                         Dashboard
                                     </MenuItem>
-                                    <MenuItem href="/products" icon={Package}>
-                                        Produk
-                                    </MenuItem>
+                                    <MenuDropdown
+                                        title="Master Produk"
+                                        icon={Package}
+                                        isOpen={isProductsOpen}
+                                        onToggle={() => setIsProductsOpen(!isProductsOpen)}
+                                        isActive={isProductsActive}
+                                    >
+                                        <SubMenuItem href="/products">Manajemen Harga</SubMenuItem>
+                                        <SubMenuItem href="/master-products">Produk</SubMenuItem>
+                                        <SubMenuItem href="/products/create">Tambah Produk</SubMenuItem>
+                                    </MenuDropdown>
                                     <MenuItem href="/users" icon={Users}>
                                         Team
                                     </MenuItem>
@@ -168,6 +236,9 @@ export default function AuthenticatedLayout({ user, children }) {
                                     </MenuItem>
                                     <MenuItem href="/stock-opnames" icon={ClipboardList}>
                                         Opname
+                                    </MenuItem>
+                                    <MenuItem href="/stock-movements" icon={Activity}>
+                                        Aktifitas Stok
                                     </MenuItem>
                                     <MenuItem href="/report" icon={FileText}>
                                         Laporan
@@ -196,31 +267,9 @@ export default function AuthenticatedLayout({ user, children }) {
                         </>
                     )}
 
-                    {/* Akun */}
-                    <div>
-                        <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mb-3 px-3 uppercase tracking-wider">
-                            Settings
-                        </p>
-                        <div className="space-y-1.5">
-                            <MenuItem href="/profile" icon={User}>
-                                Profil Saya
-                            </MenuItem>
-                        </div>
-                    </div>
+
                 </div>
 
-                {/* Footer */}
-                <div className="p-5 border-t border-slate-100 dark:border-slate-800/50 shrink-0">
-                    <Link
-                        href={route("logout")}
-                        method="post"
-                        as="button"
-                        className="w-full group flex items-center justify-center gap-2.5 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white rounded-2xl px-4 py-3 text-sm font-bold transition-all duration-300 hover:shadow-lg hover:shadow-rose-500/20"
-                    >
-                        <LogOut className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:-translate-x-0.5" />
-                        <span>Log Out</span>
-                    </Link>
-                </div>
             </aside>
 
             {/* Content */}
@@ -250,10 +299,72 @@ export default function AuthenticatedLayout({ user, children }) {
                     <div className="flex items-center gap-3 sm:gap-5">
                         <div className="flex items-center gap-2 sm:gap-3">
                             {/* Notification Bell */}
-                            <button className="relative p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors hidden sm:block">
-                                <Bell className="w-5 h-5" />
-                                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 border-2 border-slate-100 dark:border-slate-800"></span>
-                            </button>
+                            <div className="relative hidden sm:block">
+                                <button
+                                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                                    className={`relative p-2.5 rounded-full transition-colors ${isNotificationsOpen ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                >
+                                    <Bell className="w-5 h-5" />
+                                    {lowStockCount > 0 && (
+                                        <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-slate-100 dark:border-slate-800 animate-pulse"></span>
+                                    )}
+                                </button>
+
+                                {isNotificationsOpen && (
+                                    <>
+                                        <div
+                                            className="fixed inset-0 z-40"
+                                            onClick={() => setIsNotificationsOpen(false)}
+                                        ></div>
+                                        <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/50 border border-slate-100 dark:border-slate-700/60 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Notifikasi</h3>
+                                                {lowStockCount > 0 && (
+                                                    <span className="text-[10px] font-bold px-2 py-1 bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-lg">
+                                                        {lowStockCount} Peringatan
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-3 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 pr-1">
+                                                {lowStockCount > 0 ? (
+                                                    lowStockProducts.map((product) => (
+                                                        <div key={product.id} className="flex gap-3 p-2.5 bg-rose-50/50 dark:bg-rose-500/5 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors cursor-default border border-rose-100/50 dark:border-rose-900/30">
+                                                            <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                                                                <Package className="w-4 h-4" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-xs font-bold text-slate-800 dark:text-slate-100">Stok Menipis: {product.name}</p>
+                                                                <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-0.5 leading-snug">
+                                                                    Tersisa <span className="font-bold text-rose-600 dark:text-rose-400">{product.stock}</span> unit. Segera lakukan restock untuk menghindari kehabisan barang.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="py-6 text-center">
+                                                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                            <Bell className="w-5 h-5 text-slate-300 dark:text-slate-600" />
+                                                        </div>
+                                                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Tidak ada peringatan stok baru</p>
+                                                    </div>
+                                                )}
+                                            </div>
+
+
+                                            {lowStockCount > 0 && role === 'admin' && (
+                                                <Link
+                                                    href="/receivings"
+                                                    onClick={() => setIsNotificationsOpen(false)}
+                                                    className="block w-full mt-2 py-2.5 text-xs font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-xl transition-colors text-center"
+                                                >
+                                                    Buka Menu Restock
+                                                </Link>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
 
                             {/* Dark Mode Toggle */}
                             <button
@@ -272,14 +383,14 @@ export default function AuthenticatedLayout({ user, children }) {
                         {/* Divider */}
                         <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
-                        {/* Store Status Indicator */}
+                        {/* Store Status Indicator
                         <div className="hidden md:flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-bold">
                             <span className="relative flex h-2.5 w-2.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                             </span>
                             <span className="hidden lg:inline">Toko Buka</span>
-                        </div>
+                        </div> */}
 
                         {/* User Profile Dropdown */}
                         <div className="relative">
@@ -298,8 +409,16 @@ export default function AuthenticatedLayout({ user, children }) {
                                 <div className="relative flex items-center gap-1.5">
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-indigo-500 rounded-xl blur-sm opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                                        <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-sky-400 text-white flex items-center justify-center font-extrabold text-base sm:text-lg shadow-md group-hover:-translate-y-0.5 group-hover:shadow-lg group-hover:shadow-indigo-500/30 transition-all duration-300">
-                                            {user?.name?.charAt(0) || "U"}
+                                        <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-sky-400 text-white flex items-center justify-center font-extrabold text-base sm:text-lg shadow-md group-hover:-translate-y-0.5 group-hover:shadow-lg group-hover:shadow-indigo-500/30 transition-all duration-300 overflow-hidden">
+                                            {user?.avatar ? (
+                                                <img
+                                                    src={`/storage/${user.avatar}`}
+                                                    className="w-full h-full object-cover"
+                                                    alt={user?.name}
+                                                />
+                                            ) : (
+                                                user?.name?.charAt(0) || "U"
+                                            )}
                                         </div>
                                     </div>
                                     <ChevronDown className="w-4 h-4 text-slate-400 transition-transform duration-300" style={{ transform: isProfileOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />

@@ -41,11 +41,20 @@ class ReportController extends Controller
         $dateEnd = $endDate->toDateString();
 
         $salesQuery = Sale::whereBetween('created_at', [$startDate, $endDate]);
-        $receivingQuery = Receiving::whereBetween('date', [$dateStart, $dateEnd]);
-        $returnQuery = ReturnItem::whereBetween('date', [$dateStart, $dateEnd]);
 
         $salesTotal = (clone $salesQuery)->sum('total');
-        $receivingTotal = (clone $receivingQuery)->sum('total');
+
+        // Calculate profit dynamically by fetching sales with their products and their latest receiving cost price
+        $salesWithProduct = (clone $salesQuery)->with(['product' => function ($q) {
+            $q->withTrashed()->with('latestReceiving');
+        }])->get();
+
+        $profitTotal = $salesWithProduct->sum(function ($sale) {
+            $costPrice = $sale->product && $sale->product->latestReceiving
+                ? $sale->product->latestReceiving->cost_price
+                : 0;
+            return $sale->total - ($costPrice * $sale->qty);
+        });
 
         return [
             'filters' => [
@@ -56,15 +65,7 @@ class ReportController extends Controller
                 'sales_total' => $salesTotal,
                 'sales_qty' => (clone $salesQuery)->sum('qty'),
                 'sales_count' => (clone $salesQuery)->count(),
-                'receiving_total' => $receivingTotal,
-                'receiving_qty' => (clone $receivingQuery)->sum('qty'),
-                'receiving_count' => (clone $receivingQuery)->count(),
-                'return_qty' => (clone $returnQuery)->sum('qty'),
-                'return_count' => (clone $returnQuery)->count(),
-                'net_cash' => $salesTotal - $receivingTotal,
-                'product_count' => Product::count(),
-                'current_stock' => Product::sum('stock'),
-                'low_stock' => Product::where('stock', '<=', 700)->count(),
+                'profit' => $profitTotal,
             ],
             'topProducts' => Sale::query()
                 ->join('products', 'sales.product_id', '=', 'products.id')
@@ -74,26 +75,6 @@ class ReportController extends Controller
                 ->orderByDesc('total_sales')
                 ->limit(10)
                 ->get(),
-            'supplierPurchases' => Receiving::query()
-                ->join('suppliers', 'receivings.supplier_id', '=', 'suppliers.id')
-                ->whereBetween('receivings.date', [$dateStart, $dateEnd])
-                ->selectRaw('suppliers.id as supplier_id, suppliers.name as supplier_name, SUM(receivings.qty) as total_qty, SUM(receivings.total) as total_purchase')
-                ->groupBy('suppliers.id', 'suppliers.name')
-                ->orderByDesc('total_purchase')
-                ->limit(10)
-                ->get(),
-            'returnsByProduct' => ReturnItem::query()
-                ->join('products', 'return_items.product_id', '=', 'products.id')
-                ->whereBetween('return_items.date', [$dateStart, $dateEnd])
-                ->selectRaw('products.id as product_id, products.name as product_name, SUM(return_items.qty) as total_qty, COUNT(return_items.id) as total_cases')
-                ->groupBy('products.id', 'products.name')
-                ->orderByDesc('total_qty')
-                ->limit(10)
-                ->get(),
-            'stockProducts' => Product::query()
-                ->orderBy('stock', 'asc')
-                ->limit(15)
-                ->get(['id', 'name', 'stock', 'price']),
             'latestSales' => Sale::with('product')
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->latest()

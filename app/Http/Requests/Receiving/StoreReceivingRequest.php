@@ -15,11 +15,12 @@ class StoreReceivingRequest extends FormRequest
     {
         return [
             'supplier_id' => ['required', 'exists:suppliers,id'],
-            'product_id' => ['nullable', 'exists:products,id'],
-            'product_name' => ['required_without:product_id', 'nullable', 'string', 'max:255'],
-            'qty' => ['required', 'integer', 'min:1'],
-            'cost_price' => ['required', 'numeric', 'min:0'],
             'date' => ['required', 'date'],
+            'items' => ['required', 'array', 'min:1', 'max:2'],
+            'items.*.product_id' => ['nullable', 'exists:products,id'],
+            'items.*.product_name' => ['required', 'string'],
+            'items.*.qty' => ['required', 'integer', 'min:1'],
+            'items.*.cost_price' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

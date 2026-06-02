@@ -168,19 +168,12 @@ export default function Register() {
                 </div>
 
                 <div className="text-center mt-6">
-                    <span className="text-slate-600 dark:text-slate-400 text-sm">Already have an account? </span>
+                    <span className="text-slate-600 dark:text-slate-400 text-sm">Sudah memiliki akun? </span>
                     <Link href={route('login')} className="text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors">
-                        Sign in instead
+                        Masuk Disini
                     </Link>
                 </div>
 
-                {/* LOGIN */}
-                <p className="text-center text-sm text-white mt-4">
-                    Sudah punya akun?{' '}
-                    <Link href={route('login')} className="underline">
-                        Login
-                    </Link>
-                </p>
 
             </form>
 

@@ -39,7 +39,7 @@ function Card({ title, value, icon: Icon, color = "text-slate-800 dark:text-slat
                         </div>
                     )}
                 </div>
-                <h2 className={`text-3xl font-extrabold tracking-tight ${color} drop-shadow-sm`}>
+                <h2 className={`text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight ${color} drop-shadow-sm break-all`}>
                     {value}
                 </h2>
             </div>
@@ -136,7 +136,7 @@ function SalesTable({ latestSales = [], formatRupiah }) {
 
             {/* Table */}
             <div className="overflow-x-auto">
-                <table className="w-full text-sm text-slate-700 dark:text-slate-300">
+                <table className="w-full text-sm text-slate-700 dark:text-slate-300 table-responsive-cards">
                     <thead className="bg-slate-50/50 dark:bg-slate-900/30 text-slate-500 dark:text-slate-400">
                         <tr>
                             <th className="px-5 py-4 text-center font-semibold w-12">No</th>
@@ -303,7 +303,7 @@ export default function Dashboard({
 
             <div className="space-y-8 max-w-7xl mx-auto">
                 {/* Header Banner */}
-                <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 dark:from-indigo-900 dark:via-blue-900 dark:to-sky-900 rounded-3xl p-8 sm:p-10 text-white shadow-xl shadow-blue-500/20 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/30 group">
+                <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 dark:from-indigo-900 dark:via-blue-900 dark:to-sky-900 rounded-3xl p-6 sm:p-8 lg:p-10 text-white shadow-xl shadow-blue-500/20 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/30 group">
                     {/* Decorative Background Elements */}
                     <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/10 blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
                     <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-indigo-500/30 blur-2xl group-hover:bg-indigo-400/40 transition-all duration-700"></div>
@@ -314,13 +314,13 @@ export default function Dashboard({
                             <Sparkles className="w-4 h-4 text-yellow-300" />
                             <span>{role === "admin" ? "Admin Area" : "Kasir Area"}</span>
                         </div>
-                        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-3">
+                        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-3">
                             {role === "admin"
                                 ? "Dashboard Admin"
                                 : "Dashboard Kasir"}
                         </h1>
 
-                        <p className="text-blue-100 dark:text-blue-200 text-lg font-medium opacity-90 max-w-xl">
+                        <p className="text-blue-100 dark:text-blue-200 text-sm sm:text-lg font-medium opacity-90 max-w-xl">
                             Selamat datang kembali, <span className="font-bold text-white">{user?.name || "User"}</span>! Pantau terus performa bisnismu hari ini.
                         </p>
                     </div>

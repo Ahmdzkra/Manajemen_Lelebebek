@@ -70,7 +70,7 @@ export default function Index({ auth, suppliers, filters }) {
                         placeholder="Cari supplier..." 
                         defaultValue={filters.search} 
                         onChange={(e) => router.get('/suppliers', { search: e.target.value }, { preserveState: true, replace: true })}
-                        className="sm:w-64"
+                        containerClassName="sm:w-64"
                     />
                 </PageHeader>
 
@@ -81,7 +81,7 @@ export default function Index({ auth, suppliers, filters }) {
                         </Badge>
                     </div>
 
-                    <form onSubmit={submit} className="grid md:grid-cols-4 gap-4">
+                    <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <Input 
                             label="Nama Supplier"
                             placeholder="Contoh: PT. Lele Jaya"
@@ -142,8 +142,8 @@ export default function Index({ auth, suppliers, filters }) {
                                     <th className="px-6 py-4 text-center font-semibold w-16">No</th>
                                     <th className="px-6 py-4 text-left font-semibold">Nama Supplier</th>
                                     <th className="px-6 py-4 text-left font-semibold">Kontak</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Email</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Alamat</th>
+                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold hidden md:table-cell">Email</th>
+                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold hidden lg:table-cell">Alamat</th>
                                     <th className="px-6 py-4 text-center font-semibold">Aksi</th>
                                 </tr>
                             </thead>
@@ -162,8 +162,8 @@ export default function Index({ auth, suppliers, filters }) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-left font-medium">{item.phone || '-'}</td>
-                                        <td className="px-6 py-4 text-left text-slate-500 text-xs">{item.email || '-'}</td>
-                                        <td className="px-6 py-4 text-left text-slate-500 dark:text-slate-400 italic text-xs">{item.address || '-'}</td>
+                                        <td className="px-3 sm:px-6 py-4 text-left text-slate-500 text-xs hidden md:table-cell">{item.email || '-'}</td>
+                                        <td className="px-3 sm:px-6 py-4 text-left text-slate-500 dark:text-slate-400 italic text-xs hidden lg:table-cell">{item.address || '-'}</td>
                                         <td className="px-6 py-4 text-center">
                                             <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => editData(item)} className="p-2 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors">

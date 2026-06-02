@@ -155,13 +155,6 @@ export default function Login({ status, canResetPassword }) {
                     </Link>
                 </div>
 
-                {/* REGISTER */}
-                <p className="text-center text-sm text-white mt-4">
-                    Belum punya akun?{' '}
-                    <Link href={route('register')} className="underline">
-                        Register
-                    </Link>
-                </p>
 
             </form>
 

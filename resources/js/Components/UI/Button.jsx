@@ -1,51 +1,49 @@
-import React from 'react';
-import { Loader2 } from 'lucide-react';
+import React from "react";
+import { cn } from "@/lib/utils";
 
-export default function Button({ 
-    children, 
-    type = 'button', 
-    variant = 'primary', 
-    className = '', 
-    onClick, 
-    disabled = false,
-    loading = false,
-    icon: Icon
-}) {
-    const variants = {
-        primary: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/30',
-        secondary: 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200',
-        danger: 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/30',
-        warning: 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/30',
-        success: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/30',
-        info: 'bg-cyan-600 hover:bg-cyan-700 text-white shadow-cyan-600/30',
-        ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-600 dark:text-slate-400',
-    };
-
-    const baseStyles = 'inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed shadow-lg focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900';
+const Button = React.forwardRef(({ 
+    className, 
+    variant = "default", 
+    size = "default", 
+    asChild = false, 
+    ...props 
+}, ref) => {
     
-    const ringStyles = {
-        primary: 'focus:ring-indigo-500',
-        secondary: 'focus:ring-slate-400',
-        danger: 'focus:ring-rose-500',
-        warning: 'focus:ring-amber-400',
-        success: 'focus:ring-emerald-500',
-        info: 'focus:ring-cyan-500',
-        ghost: 'focus:ring-slate-300',
+    // Mapping variant ke class Tailwind manual
+    const variants = {
+        default: "bg-green-600 text-white shadow-sm hover:bg-green-700",
+        destructive: "bg-red-600 text-white shadow-sm hover:bg-red-700",
+        outline: "border border-gray-300 dark:border-slate-600 bg-transparent shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200",
+        secondary: "bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 shadow-sm hover:bg-gray-200 dark:hover:bg-slate-600",
+        ghost: "hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200",
+        link: "text-green-600 dark:text-green-400 underline-offset-4 hover:underline",
+        warning: "bg-amber-500 text-white shadow-sm hover:bg-amber-600",
     };
+
+    const sizes = {
+        default: "h-10 px-4 py-2",
+        sm: "h-8 rounded-md px-3 text-xs",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+    };
+
+    const baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 disabled:pointer-events-none disabled:opacity-50";
 
     return (
         <button
-            type={type}
-            onClick={onClick}
-            disabled={disabled || loading}
-            className={`${baseStyles} ${variants[variant] || variants.primary} ${ringStyles[variant] || ringStyles.primary} ${className}`}
-        >
-            {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-            ) : Icon ? (
-                <Icon className="w-5 h-5" />
-            ) : null}
-            {children}
-        </button>
+            ref={ref}
+            className={cn(
+                baseStyles,
+                variants[variant] || variants.default,
+                sizes[size] || sizes.default,
+                className
+            )}
+            {...props}
+        />
     );
-}
+});
+
+Button.displayName = "Button";
+
+export { Button };
+export default Button;

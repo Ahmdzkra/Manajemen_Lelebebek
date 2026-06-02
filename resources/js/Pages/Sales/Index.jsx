@@ -23,7 +23,7 @@ import Badge from '@/Components/UI/Badge';
 import PageHeader from '@/Components/UI/PageHeader';
 import Modal from '@/Components/Modal';
 
-export default function Index({ auth, products = [], recentTransactions = [], filters = {} }) {
+export default function Index({ auth, products = [], recentTransactions = [], filters = {}, flash = {} }) {
     const [search, setSearch] = useState(filters.search || '');
     const [cart, setCart] = useState(() => {
         try {
@@ -36,6 +36,12 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
     const [showCheckout, setShowCheckout] = useState(false);
     const [payAmount, setPayAmount] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('cash');
+
+    useEffect(() => {
+        if (flash?.print_id) {
+            window.open(`/sales/${flash.print_id}/print`, '_blank');
+        }
+    }, [flash?.print_id]);
 
     useEffect(() => {
         localStorage.setItem('pos_cart', JSON.stringify(cart));
@@ -122,7 +128,7 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
         <AuthenticatedLayout user={auth.user}>
             <Head title="Kasir POS" />
 
-            <div className="max-w-[1600px] mx-auto h-[calc(100vh-120px)] flex flex-col lg:flex-row gap-6 overflow-hidden">
+            <div className="max-w-[1600px] mx-auto h-auto lg:h-[calc(100vh-120px)] flex flex-col lg:flex-row gap-6 overflow-visible lg:overflow-hidden">
                 {/* Left Side: Product Selection */}
                 <div className="flex-1 flex flex-col min-w-0 space-y-6">
                     <PageHeader
@@ -140,9 +146,9 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
                         />
                     </PageHeader>
 
-                    <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
+                    <div className="flex-1 overflow-y-auto pr-0 lg:pr-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
                         {filteredProducts.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
                                 {filteredProducts.map(product => (
                                     <div
                                         key={product.id}
@@ -186,7 +192,7 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
                 </div>
 
                 {/* Right Side: Cart Sidebar */}
-                <div className="w-full lg:w-[400px] flex flex-col min-h-0">
+                <div className="w-full lg:w-[400px] flex flex-col min-h-0 lg:max-h-full max-h-[60vh]">
                     <Card noPadding className="flex-1 flex flex-col overflow-hidden border-indigo-100 dark:border-indigo-900/30">
                         <div className="p-6 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/30">
                             <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">

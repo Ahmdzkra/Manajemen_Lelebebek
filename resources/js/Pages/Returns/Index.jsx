@@ -68,13 +68,13 @@ export default function Index({
                             <RotateCcw className="w-4 h-4" />
                             <span>Outbound Logistics</span>
                         </div>
-                        <h1 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">Retur / Refund</h1>
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">Retur / Refund</h1>
                         <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">Kelola barang rusak, retur ke supplier, dan koreksi stok gudang.</p>
                     </div>
                 </div>
 
                 {/* Statistik */}
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/60 p-6 flex items-center gap-5 transition-colors duration-300 group hover:border-indigo-500/30">
                         <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                             <FileText className="w-6 h-6" />
@@ -219,24 +219,24 @@ export default function Index({
                     </div>
 
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-slate-700 dark:text-slate-300">
+                        <table className="w-full text-sm text-slate-700 dark:text-slate-300 table-responsive-cards">
                             <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
                                 <tr>
-                                    <th className="px-6 py-4 text-left font-semibold">Supplier</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Produk</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Qty</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Alasan</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Tanggal</th>
+                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold">Supplier</th>
+                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold">Produk</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Qty</th>
+                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold">Alasan</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Tanggal</th>
                                 </tr>
                             </thead>
 
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
                                 {(returns.data || returns).map((item) => (
                                     <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors group">
-                                        <td className="px-6 py-4 text-left font-medium text-slate-800 dark:text-slate-200">
+                                        <td className="px-3 sm:px-6 py-4 text-left font-medium text-slate-800 dark:text-slate-200" data-label="Supplier">
                                             {item.supplier?.name}
                                         </td>
-                                        <td className="px-6 py-4 text-left font-medium text-slate-800 dark:text-slate-200">
+                                        <td className="px-3 sm:px-6 py-4 text-left font-medium text-slate-800 dark:text-slate-200" data-label="Produk">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-500 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                                                     <Package className="w-4 h-4" />
@@ -244,15 +244,17 @@ export default function Index({
                                                 {item.product?.name}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-3 sm:px-6 py-4 text-center" data-label="Qty">
                                             <span className="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 text-xs font-bold">
                                                 {item.qty}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-left text-slate-500 dark:text-slate-400 max-w-xs truncate">
-                                            {item.reason}
+                                        <td className="px-3 sm:px-6 py-4 text-left" data-label="Alasan">
+                                            <div className="text-slate-500 dark:text-slate-400 max-w-xs truncate">
+                                                {item.reason}
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                        <td className="px-3 sm:px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap" data-label="Tanggal">
                                             {formatDate(item.date, false)}
                                         </td>
                                     </tr>

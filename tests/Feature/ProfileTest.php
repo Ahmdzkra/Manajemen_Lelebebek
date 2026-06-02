@@ -96,4 +96,28 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_user_can_delete_their_avatar(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+        $file = \Illuminate\Http\UploadedFile::fake()->image('avatar.jpg');
+        $path = $file->store('avatars', 'public');
+
+        $user = User::factory()->create([
+            'avatar' => $path,
+        ]);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk('public')->exists($path));
+
+        $response = $this
+            ->actingAs($user)
+            ->delete('/profile/avatar');
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $this->assertFalse(\Illuminate\Support\Facades\Storage::disk('public')->exists($path));
+        $this->assertNull($user->fresh()->avatar);
+    }
 }

@@ -1,5 +1,4 @@
 import { Head } from '@inertiajs/react';
-import { motion } from 'framer-motion';
 
 export default function AuthLayout({ title, subtitle, children }) {
     return (
@@ -7,11 +6,7 @@ export default function AuthLayout({ title, subtitle, children }) {
 
             <Head title={title} />
 
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md p-8 bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20"
-            >
+            <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20">
                 <h2 className="text-3xl font-bold text-white text-center mb-2">
                     {title}
                 </h2>
@@ -23,7 +18,7 @@ export default function AuthLayout({ title, subtitle, children }) {
                 )}
 
                 {children}
-            </motion.div>
+            </div>
         </div>
     );
 }
