@@ -17,6 +17,8 @@ class StoreProductRequest extends FormRequest
             'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('products', 'name')],
             'stock' => ['required', 'integer', 'min:0'],
             'price' => ['required', 'numeric', 'min:0'],
+            'cost_price' => ['nullable', 'numeric', 'min:0'],
+            'created_at' => ['nullable', 'date'],
         ];
     }
 }

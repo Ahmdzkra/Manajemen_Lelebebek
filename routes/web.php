@@ -28,8 +28,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+
+    Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])
+        ->name('profile.avatar.destroy');
 });
 
 require __DIR__ . '/cashier.php';
 require __DIR__ . '/admin.php';
 require __DIR__ . '/auth.php';
+
+// Custom 404 page - fallback harus di paling bawah
+Route::fallback(function () {
+    return Inertia::render('NotFound');
+});

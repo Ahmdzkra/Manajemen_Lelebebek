@@ -99,7 +99,7 @@ export default function Index({ auth, products = [], opnames = [] }) {
                         </div>
 
                         {data.product_id && data.physical_stock !== "" && (
-                            <div className="md:col-span-2 grid grid-cols-3 gap-4 mt-2">
+                            <div className="md:col-span-2 grid grid-cols-3 gap-2 sm:gap-4 mt-2">
                                 <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
                                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Stok Sistem</p>
                                     <h3 className="text-2xl font-extrabold text-slate-700 dark:text-slate-300">{systemStock}</h3>
@@ -145,20 +145,20 @@ export default function Index({ auth, products = [], opnames = [] }) {
                         <Badge variant="slate">{opnames.total || 0} data</Badge>
                     </div>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-slate-700 dark:text-slate-300">
+                        <table className="w-full text-sm text-slate-700 dark:text-slate-300 table-responsive-cards">
                             <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
                                 <tr>
-                                    <th className="px-6 py-4 text-left font-semibold">Produk</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Stok Sistem</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Stok Fisik</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Selisih</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Tanggal</th>
+                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold">Produk</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Stok Sistem</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Stok Fisik</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Selisih</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Tanggal</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
                                 {(opnames.data || opnames).map((item) => (
                                     <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors group">
-                                        <td className="px-6 py-4 text-left font-medium text-slate-800 dark:text-slate-200">
+                                        <td className="px-3 sm:px-6 py-4 text-left font-medium text-slate-800 dark:text-slate-200" data-label="Produk">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full bg-cyan-50 dark:bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                                                     <Package className="w-4 h-4" />
@@ -166,18 +166,18 @@ export default function Index({ auth, products = [], opnames = [] }) {
                                                 {item.product?.name}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-6 py-4 text-center" data-label="Sistem">
                                             <Badge variant="slate">{item.system_stock}</Badge>
                                         </td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-6 py-4 text-center" data-label="Fisik">
                                             <Badge variant="primary">{item.physical_stock}</Badge>
                                         </td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-6 py-4 text-center" data-label="Selisih">
                                             <Badge variant={item.difference < 0 ? 'danger' : item.difference > 0 ? 'success' : 'slate'} icon={item.difference < 0 ? TrendingDown : item.difference > 0 ? TrendingUp : CheckCircle2}>
                                                 {item.difference > 0 ? `+${item.difference}` : item.difference}
                                             </Badge>
                                         </td>
-                                        <td className="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                        <td className="px-3 sm:px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap" data-label="Tanggal">
                                             {formatDate(item.date, false)}
                                         </td>
                                     </tr>

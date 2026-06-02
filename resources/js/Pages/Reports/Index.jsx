@@ -38,7 +38,7 @@ function SummaryCard({ title, value, subtitle, icon: Icon, tone = "indigo" }) {
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                         {title}
                     </p>
-                    <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100">
+                    <h2 className="mt-3 text-xl sm:text-2xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100 break-all">
                         {value}
                     </h2>
                     {subtitle && (
@@ -142,7 +142,7 @@ export default function Index({
                                 <FileText className="h-4 w-4" />
                                 <span>Business Report</span>
                             </div>
-                            <h1 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
+                            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
                                 Laporan
                             </h1>
                             <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
@@ -150,7 +150,7 @@ export default function Index({
                             </p>
                         </div>
 
-                        <form onSubmit={submit} className="print:hidden grid sm:grid-cols-2 lg:grid-cols-[170px_170px_auto_auto_auto] gap-3 items-end">
+                        <form onSubmit={submit} className="print:hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[170px_170px_auto_auto_auto] gap-3 items-end">
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                                     Dari Tanggal
@@ -218,62 +218,27 @@ export default function Index({
                     )}
                 </div>
 
-                <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <SummaryCard
-                        title="Total Penjualan"
+                        title="Penjualan"
+                        value={`${formatNumber(summary.sales_qty)} Unit`}
+                        subtitle={`${formatNumber(summary.sales_count)} Transaksi`}
+                        icon={ShoppingCart}
+                        tone="indigo"
+                    />
+                    <SummaryCard
+                        title="Omset"
                         value={formatRupiah(summary.sales_total)}
-                        subtitle={`${formatNumber(summary.sales_count)} transaksi`}
+                        subtitle="Total pendapatan kotor"
                         icon={TrendingUp}
                         tone="emerald"
                     />
                     <SummaryCard
-                        title="Total Restock"
-                        value={formatRupiah(summary.receiving_total)}
-                        subtitle={`${formatNumber(summary.receiving_count)} penerimaan`}
-                        icon={ArrowDownToLine}
-                        tone="amber"
-                    />
-                    <SummaryCard
-                        title="Selisih Kas"
-                        value={formatRupiah(summary.net_cash)}
-                        subtitle="Penjualan dikurangi restock"
+                        title="Keuntungan"
+                        value={formatRupiah(summary.profit)}
+                        subtitle="Total keuntungan bersih"
                         icon={Wallet}
-                        tone={Number(summary.net_cash || 0) >= 0 ? "sky" : "rose"}
-                    />
-                    <SummaryCard
-                        title="Stok Saat Ini"
-                        value={formatNumber(summary.current_stock)}
-                        subtitle={`${formatNumber(summary.product_count)} produk`}
-                        icon={Package}
-                        tone="indigo"
-                    />
-                    <SummaryCard
-                        title="Qty Terjual"
-                        value={formatNumber(summary.sales_qty)}
-                        subtitle="Unit keluar dari POS"
-                        icon={ShoppingCart}
-                        tone="emerald"
-                    />
-                    <SummaryCard
-                        title="Qty Masuk"
-                        value={formatNumber(summary.receiving_qty)}
-                        subtitle="Unit masuk dari supplier"
-                        icon={ArrowDownToLine}
-                        tone="amber"
-                    />
-                    <SummaryCard
-                        title="Qty Retur"
-                        value={formatNumber(summary.return_qty)}
-                        subtitle={`${formatNumber(summary.return_count)} kasus retur`}
-                        icon={RotateCcw}
-                        tone="rose"
-                    />
-                    <SummaryCard
-                        title="Stok Menipis"
-                        value={formatNumber(summary.low_stock)}
-                        subtitle="Produk perlu dipantau"
-                        icon={AlertTriangle}
-                        tone="rose"
+                        tone="sky"
                     />
                 </div>
 
@@ -295,7 +260,7 @@ export default function Index({
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
                                     {topProducts.map((item) => (
                                         <tr key={item.product_id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
-                                            <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
+                                            <td className="px-6 py-4 font-bold text-slate-880 dark:text-slate-200">
                                                 {item.product_name}
                                             </td>
                                             <td className="px-6 py-4 text-center">
@@ -317,177 +282,59 @@ export default function Index({
                     </Section>
 
                     <Section
-                        title="Pembelian Supplier"
-                        icon={ArrowDownToLine}
-                        badge={`${supplierPurchases.length} supplier`}
+                        title="Penjualan Terbaru"
+                        icon={FileText}
+                        badge={`${latestSales.total || 0} transaksi`}
                     >
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm text-slate-700 dark:text-slate-300">
                                 <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
                                     <tr>
-                                        <th className="px-6 py-4 text-left font-semibold">Supplier</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Tanggal</th>
+                                        <th className="px-6 py-4 text-left font-semibold">Produk</th>
                                         <th className="px-6 py-4 text-center font-semibold">Qty</th>
+                                        <th className="px-6 py-4 text-right font-semibold">Harga</th>
                                         <th className="px-6 py-4 text-right font-semibold">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-                                    {supplierPurchases.map((item) => (
-                                        <tr key={item.supplier_id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
-                                            <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
-                                                {item.supplier_name}
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs font-bold">
-                                                    {formatNumber(item.total_qty)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right font-bold text-amber-600 dark:text-amber-400">
-                                                {formatRupiah(item.total_purchase)}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {supplierPurchases.length === 0 && (
-                                        <EmptyState icon={ArrowDownToLine} title="Belum ada penerimaan pada periode ini" />
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </Section>
-
-                    <Section
-                        title="Retur Produk"
-                        icon={RotateCcw}
-                        badge={`${returnsByProduct.length} produk`}
-                    >
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-slate-700 dark:text-slate-300">
-                                <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left font-semibold">Produk</th>
-                                        <th className="px-6 py-4 text-center font-semibold">Qty</th>
-                                        <th className="px-6 py-4 text-center font-semibold">Kasus</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-                                    {returnsByProduct.map((item) => (
-                                        <tr key={item.product_id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
-                                            <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
-                                                {item.product_name}
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 text-xs font-bold">
-                                                    {formatNumber(item.total_qty)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-center font-semibold">
-                                                {formatNumber(item.total_cases)}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {returnsByProduct.length === 0 && (
-                                        <EmptyState icon={RotateCcw} title="Belum ada retur pada periode ini" />
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </Section>
-
-                    <Section
-                        title="Stok Terendah"
-                        icon={Package}
-                        badge={`${stockProducts.length} produk`}
-                    >
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-slate-700 dark:text-slate-300">
-                                <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left font-semibold">Produk</th>
-                                        <th className="px-6 py-4 text-center font-semibold">Stok</th>
-                                        <th className="px-6 py-4 text-right font-semibold">Harga</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-                                    {stockProducts.map((item) => (
+                                    {(latestSales.data || latestSales).map((item) => (
                                         <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
-                                            <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
-                                                {item.name}
+                                            <td className="px-6 py-4 text-slate-505 dark:text-slate-400 whitespace-nowrap">
+                                                {formatDate(item.created_at)}
+                                            </td>
+                                            <td className="px-6 py-4 font-bold text-slate-880 dark:text-slate-200">
+                                                {item.product?.name || "-"}
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                                    Number(item.stock) <= 700
-                                                        ? "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400"
-                                                        : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-                                                }`}>
-                                                    {formatNumber(item.stock)}
+                                                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold">
+                                                    {formatNumber(item.qty)}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right font-semibold">
                                                 {formatRupiah(item.price)}
                                             </td>
+                                            <td className="px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
+                                                {formatRupiah(item.total)}
+                                            </td>
                                         </tr>
                                     ))}
-                                    {stockProducts.length === 0 && (
-                                        <EmptyState icon={Package} title="Belum ada produk" />
+                                    {((latestSales.data || latestSales).length === 0) && (
+                                        <tr>
+                                            <td colSpan="5" className="px-6 py-12 text-center">
+                                                <div className="flex flex-col items-center text-slate-400 dark:text-slate-500">
+                                                    <FileText className="mb-3 h-12 w-12 opacity-20" />
+                                                    <p className="font-semibold">Belum ada penjualan pada periode ini</p>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
+                        {latestSales.links && <Pagination links={latestSales.links} />}
                     </Section>
                 </div>
-
-                <Section
-                    title="Penjualan Terbaru"
-                    icon={FileText}
-                    badge={`${latestSales.total || 0} transaksi`}
-                >
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-slate-700 dark:text-slate-300">
-                            <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
-                                <tr>
-                                    <th className="px-6 py-4 text-left font-semibold">Tanggal</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Produk</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Qty</th>
-                                    <th className="px-6 py-4 text-right font-semibold">Harga</th>
-                                    <th className="px-6 py-4 text-right font-semibold">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-                                {(latestSales.data || latestSales).map((item) => (
-                                    <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
-                                        <td className="px-6 py-4 text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                                            {formatDate(item.created_at)}
-                                        </td>
-                                        <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
-                                            {item.product?.name || "-"}
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold">
-                                                {formatNumber(item.qty)}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right font-semibold">
-                                            {formatRupiah(item.price)}
-                                        </td>
-                                        <td className="px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
-                                            {formatRupiah(item.total)}
-                                        </td>
-                                    </tr>
-                                ))}
-                                {((latestSales.data || latestSales).length === 0) && (
-                                    <tr>
-                                        <td colSpan="5" className="px-6 py-12 text-center">
-                                            <div className="flex flex-col items-center text-slate-400 dark:text-slate-500">
-                                                <FileText className="mb-3 h-12 w-12 opacity-20" />
-                                                <p className="font-semibold">Belum ada penjualan pada periode ini</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    {latestSales.links && <Pagination links={latestSales.links} />}
-                </Section>
             </div>
         </AuthenticatedLayout>
     );

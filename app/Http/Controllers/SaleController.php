@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Inventory\RecordTransactionAction;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -32,16 +33,24 @@ class SaleController extends Controller
 
     public function store(Request $request, RecordTransactionAction $recordTransaction)
     {
-        $recordTransaction->handle($request->all());
+        $transaction = $recordTransaction->handle($request->all());
 
         return redirect()
             ->route('sales.index')
-            ->with('success', 'Transaksi berhasil disimpan.');
+            ->with('success', 'Transaksi berhasil disimpan.')
+            ->with('print_id', $transaction->id);
     }
 
-    public function print(Transaction $transaction)
+    public function print($id)
     {
-        $transaction->load(['user', 'details.product']);
+        $transaction = Transaction::with(['user', 'details.product'])->find($id);
+
+        if (!$transaction) {
+            $sale = Sale::with('product')->find($id);
+            return Inertia::render('Sales/Print', [
+                'sale' => $sale,
+            ]);
+        }
 
         return Inertia::render('Sales/Print', [
             'transaction' => $transaction,

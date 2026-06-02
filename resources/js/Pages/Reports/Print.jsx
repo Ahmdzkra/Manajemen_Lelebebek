@@ -85,35 +85,16 @@ export default function Print({
 
     const periodLabel = `${formatDate(filters.start_date, false)} - ${formatDate(filters.end_date, false)}`;
 
-    const productRows = topProducts.map((item) => ({
+    const topProductsList = Array.isArray(topProducts) ? topProducts : (topProducts?.data || []);
+    const productRows = topProductsList.map((item) => ({
         key: item.product_id,
         product: item.product_name,
         qty: formatNumber(item.total_qty),
         total: formatRupiah(item.total_sales),
     }));
 
-    const supplierRows = supplierPurchases.map((item) => ({
-        key: item.supplier_id,
-        supplier: item.supplier_name,
-        qty: formatNumber(item.total_qty),
-        total: formatRupiah(item.total_purchase),
-    }));
-
-    const returnRows = returnsByProduct.map((item) => ({
-        key: item.product_id,
-        product: item.product_name,
-        qty: formatNumber(item.total_qty),
-        cases: formatNumber(item.total_cases),
-    }));
-
-    const stockRows = stockProducts.map((item) => ({
-        key: item.id,
-        product: item.name,
-        stock: formatNumber(item.stock),
-        price: formatRupiah(item.price),
-    }));
-
-    const saleRows = latestSales.map((item) => ({
+    const salesList = Array.isArray(latestSales) ? latestSales : (latestSales?.data || []);
+    const saleRows = salesList.map((item) => ({
         key: item.id,
         date: formatDate(item.created_at),
         product: item.product?.name || "-",
@@ -157,17 +138,10 @@ export default function Print({
                     </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-xs">
-                    <SummaryRow label="Total Penjualan" value={formatRupiah(summary.sales_total)} />
-                    <SummaryRow label="Transaksi" value={`${formatNumber(summary.sales_count)} data`} />
-                    <SummaryRow label="Total Restock" value={formatRupiah(summary.receiving_total)} />
-                    <SummaryRow label="Penerimaan" value={`${formatNumber(summary.receiving_count)} data`} />
-                    <SummaryRow label="Selisih Kas" value={formatRupiah(summary.net_cash)} />
-                    <SummaryRow label="Qty Terjual" value={formatNumber(summary.sales_qty)} />
-                    <SummaryRow label="Qty Masuk" value={formatNumber(summary.receiving_qty)} />
-                    <SummaryRow label="Qty Retur" value={formatNumber(summary.return_qty)} />
-                    <SummaryRow label="Stok Saat Ini" value={formatNumber(summary.current_stock)} />
-                    <SummaryRow label="Stok Menipis" value={`${formatNumber(summary.low_stock)} produk`} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-1 text-xs">
+                    <SummaryRow label="Penjualan" value={`${formatNumber(summary.sales_qty)} unit (${formatNumber(summary.sales_count)} transaksi)`} />
+                    <SummaryRow label="Omset" value={formatRupiah(summary.sales_total)} />
+                    <SummaryRow label="Keuntungan" value={formatRupiah(summary.profit)} />
                 </div>
 
                 <MiniTable
@@ -179,39 +153,6 @@ export default function Print({
                     ]}
                     rows={productRows}
                     emptyText="Belum ada penjualan pada periode ini"
-                />
-
-                <MiniTable
-                    title="Pembelian Supplier"
-                    columns={[
-                        { key: "supplier", label: "Supplier" },
-                        { key: "qty", label: "Qty", align: "center" },
-                        { key: "total", label: "Total", align: "right" },
-                    ]}
-                    rows={supplierRows}
-                    emptyText="Belum ada penerimaan pada periode ini"
-                />
-
-                <MiniTable
-                    title="Retur Produk"
-                    columns={[
-                        { key: "product", label: "Produk" },
-                        { key: "qty", label: "Qty", align: "center" },
-                        { key: "cases", label: "Kasus", align: "center" },
-                    ]}
-                    rows={returnRows}
-                    emptyText="Belum ada retur pada periode ini"
-                />
-
-                <MiniTable
-                    title="Stok Terendah"
-                    columns={[
-                        { key: "product", label: "Produk" },
-                        { key: "stock", label: "Stok", align: "center" },
-                        { key: "price", label: "Harga", align: "right" },
-                    ]}
-                    rows={stockRows}
-                    emptyText="Belum ada produk"
                 />
 
                 <MiniTable
@@ -238,13 +179,14 @@ export default function Print({
                     <div className="mt-8 pt-6 border-t border-slate-50 flex flex-col items-center">
                         <div className="w-12 h-1 bg-slate-100 rounded-full mb-2"></div>
                         <p className="text-[8px] text-slate-300 font-bold uppercase tracking-[0.3em]">
-                            LeleBek Management System
+                            LeleBek Segar Dari Alam
                         </p>
                     </div>
                 </div>
             </div>
 
-            <style dangerouslySetInnerHTML={{ __html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @media print {
                     @page {
                         margin: 10mm;

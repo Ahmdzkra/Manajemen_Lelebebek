@@ -69,7 +69,7 @@ export default function Index({ auth, users, filters }) {
                         placeholder="Cari user..." 
                         defaultValue={filters.search} 
                         onChange={(e) => router.get('/users', { search: e.target.value }, { preserveState: true, replace: true })}
-                        className="sm:w-64"
+                        containerClassName="sm:w-64"
                     />
                 </PageHeader>
 
@@ -80,7 +80,7 @@ export default function Index({ auth, users, filters }) {
                         </Badge>
                     </div>
 
-                    <form onSubmit={submit} className="grid md:grid-cols-4 gap-4">
+                    <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <Input 
                             label="Nama Lengkap"
                             icon={User}
@@ -130,41 +130,40 @@ export default function Index({ auth, users, filters }) {
 
                 <Card noPadding>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-slate-700 dark:text-slate-300">
+                        <table className="w-full text-sm text-slate-700 dark:text-slate-300 table-responsive-cards">
                             <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
                                 <tr>
-                                    <th className="px-6 py-4 text-center font-semibold w-16">No</th>
-                                    <th className="px-6 py-4 text-left font-semibold">User</th>
-
-                                    <th className="px-6 py-4 text-center font-semibold">Role</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Terdaftar</th>
-                                    <th className="px-6 py-4 text-center font-semibold">Aksi</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold w-16">No</th>
+                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold">User</th>
+                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold hidden md:table-cell">Kontak</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Role</th>
+                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
                                 {users.data.map((item, index) => (
                                     <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors group">
-                                        <td className="px-6 py-4 text-center text-slate-400 font-medium">
+                                        <td className="px-3 sm:px-6 py-4 text-center text-slate-400 dark:text-slate-500 font-medium" data-label="No">
                                             {(users.current_page - 1) * users.per_page + index + 1}
                                         </td>
-                                        <td className="px-6 py-4 text-left font-bold text-slate-800 dark:text-slate-200">
+                                        <td className="px-3 sm:px-6 py-4 text-left font-bold text-slate-800 dark:text-slate-200" data-label="User">
                                             <div className="flex flex-col">
                                                 <span>{item.name}</span>
-                                                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1 md:hidden">
                                                     <Mail className="w-3 h-3" /> {item.email}
                                                 </span>
                                             </div>
                                         </td>
 
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-3 sm:px-6 py-4 text-left hidden md:table-cell text-xs text-slate-500 dark:text-slate-400">
+                                            {item.email}
+                                        </td>
+                                        <td className="px-3 sm:px-6 py-4 text-center" data-label="Role">
                                             <Badge variant={item.role === 'admin' ? 'info' : 'slate'} icon={Shield}>
                                                 {item.role === 'admin' ? 'Administrator' : 'Kasir'}
                                             </Badge>
                                         </td>
-                                        <td className="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-400">
-                                            {formatDate(item.created_at)}
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-3 sm:px-6 py-4 text-center">
                                             <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => editData(item)} title="Edit User" className="p-2 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors">
                                                     <Edit2 className="w-4 h-4" />

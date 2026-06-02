@@ -4,7 +4,6 @@ import TextInput from '@/Components/TextInput';
 import { useForm } from '@inertiajs/react';
 
 import { Mail } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 import AuthLayout from '@/Layouts/AuthLayout';
 
@@ -49,13 +48,9 @@ export default function ForgotPassword({ status }) {
                             onChange={(e) => setData('email', e.target.value)}
                         />
 
-                        <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="absolute left-3 top-3 text-gray-500"
-                        >
+                        <div className="absolute left-3 top-3 text-gray-500">
                             <Mail size={18} />
-                        </motion.div>
+                        </div>
                     </div>
 
                     <InputError message={errors.email} className="mt-2 text-red-300" />

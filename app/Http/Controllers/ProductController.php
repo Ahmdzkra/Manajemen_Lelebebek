@@ -21,21 +21,42 @@ class ProductController extends Controller
         ]);
     }
 
+    public function master(Request $request)
+    {
+        return Inertia::render('MasterProducts/Index', [
+            'products' => Product::filter($request->only('search', 'sort'))
+                ->paginate(10)
+                ->withQueryString(),
+            'filters' => $request->only('search', 'sort'),
+        ]);
+    }
+
     public function create()
     {
-        //
+        return Inertia::render('Products/Create');
     }
 
     public function store(StoreProductRequest $request)
     {
+        // Jalankan migrasi secara otomatis jika belum dijalankan
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+
         $validated = $request->validated();
         $validated['name'] = trim($validated['name']);
 
-        Product::create([
+        $productData = [
             'name' => $validated['name'],
             'stock' => $validated['stock'],
             'price' => $validated['price'],
-        ]);
+            'cost_price' => $validated['cost_price'] ?? null,
+        ];
+
+        if (!empty($validated['created_at'])) {
+            $productData['created_at'] = $validated['created_at'];
+            $productData['updated_at'] = $validated['created_at'];
+        }
+
+        Product::create($productData);
 
         return redirect()
             ->route('products.index')

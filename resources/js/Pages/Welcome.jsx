@@ -42,7 +42,7 @@ export default function Welcome({ auth }) {
                 </svg>
 
                 {/* Navbar */}
-                <nav className="w-full max-w-[1800px] mx-auto px-6 lg:px-10 py-8 flex items-center justify-between relative z-50 shrink-0">
+                <nav className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10 py-4 sm:py-8 flex items-center justify-between relative z-50 shrink-0">
                     <div className="flex items-center gap-4">
                         {/* Logo Icon */}
                         <div className="w-11 h-11 rounded-xl bg-[#85A059] flex items-center justify-center text-white shadow-lg shadow-[#85A059]/30">
@@ -79,7 +79,7 @@ export default function Welcome({ auth }) {
                 </nav>
 
                 {/* Main Hero Section */}
-                <main className="flex-1 flex flex-col lg:flex-row items-center justify-between w-full max-w-[1800px] mx-auto px-6 lg:px-10 relative z-10 py-4 lg:py-0 overflow-hidden">
+                <main className="flex-1 flex flex-col lg:flex-row items-center justify-between w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10 relative z-10 py-4 lg:py-0 overflow-hidden">
 
                     {/* Left Content */}
                     <div className="w-full lg:w-[45%] flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:space-y-8">
@@ -88,7 +88,7 @@ export default function Welcome({ auth }) {
                                 <Leaf className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
                                 <span>Distributor Lele & Telur Bebek</span>
                             </div>
-                            <h1 className="text-4xl sm:text-5xl lg:text-[5rem] font-black text-[#1E2922] dark:text-white leading-[1.0] tracking-tighter animate-fade-in-up">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[5rem] font-black text-[#1E2922] dark:text-white leading-[1.0] tracking-tighter animate-fade-in-up">
                                 Kualitas <span className="text-[#85A059]">Segar</span> <br />
                                 Setiap Hari.
                             </h1>
@@ -141,7 +141,7 @@ export default function Welcome({ auth }) {
                     </div>
 
                     {/* Right Illustration */}
-                    <div className="w-full lg:w-[50%] flex items-center justify-end relative mt-8 lg:mt-0 lg:pr-10 lg:translate-x-[-150px]">
+                    <div className="w-full lg:w-[50%] flex items-center justify-center lg:justify-end relative mt-4 sm:mt-8 lg:mt-0 lg:pr-10 lg:translate-x-[-150px]">
                         <div className="relative w-full max-w-[650px] aspect-square animate-fade-in flex items-center justify-end">
 
                             {/* Massive glow for impact */}
