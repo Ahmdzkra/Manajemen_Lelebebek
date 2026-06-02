@@ -30,7 +30,7 @@ function Card({ title, value, icon: Icon, color = "text-slate-800 dark:text-slat
             {/* Subtle glow effect on hover */}
             <div className="absolute inset-0 bg-white/40 dark:bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-            <div className="p-4 sm:p-6 relative z-10 flex flex-col h-full justify-between">
+            <div className="p-6 relative z-10 flex flex-col h-full justify-between">
                 <div className="flex justify-between items-start mb-4">
                     <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 tracking-wide uppercase">{title}</p>
                     {Icon && (
@@ -119,13 +119,13 @@ function SalesTable({ latestSales = [], formatRupiah }) {
     return (
         <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg shadow-slate-200/50 dark:shadow-none overflow-hidden border border-slate-100 dark:border-slate-700 transition-colors duration-300">
             {/* Header */}
-            <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-xl">
                         <Activity className="w-5 h-5" />
                     </div>
                     <div>
-                        <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100">Data Penjualan</h2>
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Data Penjualan</h2>
                         <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{latestSales.length} total transaksi</p>
                     </div>
                 </div>
@@ -139,11 +139,11 @@ function SalesTable({ latestSales = [], formatRupiah }) {
                 <table className="w-full text-sm text-slate-700 dark:text-slate-300 table-responsive-cards">
                     <thead className="bg-slate-50/50 dark:bg-slate-900/30 text-slate-500 dark:text-slate-400">
                         <tr>
-                            <th className="px-3 sm:px-5 py-4 text-center font-semibold w-12">No</th>
-                            <th className="px-3 sm:px-5 py-4 text-left font-semibold">Waktu</th>
-                            <th className="px-3 sm:px-5 py-4 text-left font-semibold">Nama Produk</th>
-                            <th className="px-3 sm:px-5 py-4 text-center font-semibold">Quantity</th>
-                            <th className="px-3 sm:px-5 py-4 text-right font-semibold">Total</th>
+                            <th className="px-5 py-4 text-center font-semibold w-12">No</th>
+                            <th className="px-5 py-4 text-left font-semibold">Waktu</th>
+                            <th className="px-5 py-4 text-left font-semibold">Nama Produk</th>
+                            <th className="px-5 py-4 text-center font-semibold">Quantity</th>
+                            <th className="px-5 py-4 text-right font-semibold">Total</th>
                         </tr>
                     </thead>
 
@@ -155,19 +155,19 @@ function SalesTable({ latestSales = [], formatRupiah }) {
                                 return (
                                     <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors duration-200 group">
                                         {/* Nomor urut global */}
-                                        <td className="px-3 sm:px-5 py-3.5 text-center" data-label="No">
+                                        <td className="px-5 py-3.5 text-center">
                                             <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-700 text-xs font-bold text-slate-500 dark:text-slate-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                                 {globalIdx + 1}
                                             </span>
                                         </td>
 
                                         {/* Waktu */}
-                                        <td className="px-3 sm:px-5 py-3.5 font-mono text-xs font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap" data-label="Waktu">
+                                        <td className="px-5 py-3.5 font-mono text-xs font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">
                                             {formatDate(item.created_at)}
                                         </td>
 
                                         {/* Nama Produk — warna unik per nama */}
-                                        <td className="px-3 sm:px-5 py-3.5" data-label="Produk">
+                                        <td className="px-5 py-3.5">
                                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${color.bg} ${color.text}`}>
                                                 <Package className="w-3 h-3" />
                                                 {item.product_name}
@@ -175,14 +175,14 @@ function SalesTable({ latestSales = [], formatRupiah }) {
                                         </td>
 
                                         {/* Qty */}
-                                        <td className="px-3 sm:px-5 py-3.5 text-center" data-label="Qty">
+                                        <td className="px-5 py-3.5 text-center">
                                             <span className="bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-full text-xs font-bold text-slate-600 dark:text-slate-300">
                                                 {item.qty}
                                             </span>
                                         </td>
 
                                         {/* Total */}
-                                        <td className="px-3 sm:px-5 py-3.5 text-right" data-label="Total">
+                                        <td className="px-5 py-3.5 text-right">
                                             <span className="font-bold text-emerald-600 dark:text-emerald-400">
                                                 {formatRupiah(item.total)}
                                             </span>
@@ -206,11 +206,11 @@ function SalesTable({ latestSales = [], formatRupiah }) {
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="px-4 sm:px-6 py-4 border-t border-slate-100 dark:border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/20">
+                <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/20">
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                         Menampilkan {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, latestSales.length)} dari {latestSales.length} data
                     </p>
-                    <div className="flex flex-wrap items-center justify-center gap-2">
+                    <div className="flex items-center gap-2">
                         <button
                             onClick={() => setPage(p => Math.max(0, p - 1))}
                             disabled={page === 0}
@@ -516,7 +516,7 @@ export default function Dashboard({
                                         const peak = Math.max(...chartData.map(d => d.sales || 0));
                                         const peakDay = chartData.find(d => d.sales === peak);
                                         return (
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                                            <div className="grid grid-cols-3 gap-3 mb-6">
                                                 <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/40 dark:to-blue-900/30 rounded-2xl p-4 border border-indigo-100/80 dark:border-indigo-800/30">
                                                     <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 dark:text-indigo-500 mb-1">Total</p>
                                                     <p className="text-base font-extrabold text-indigo-700 dark:text-indigo-300 leading-tight">{formatRupiah(total)}</p>
@@ -573,13 +573,9 @@ export default function Dashboard({
                                             <YAxis
                                                 axisLine={false}
                                                 tickLine={false}
-                                                width={80}
-                                                tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 600 }}
-                                                tickFormatter={(value) => {
-                                                    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}jt`;
-                                                    if (value >= 1000) return `${(value / 1000).toFixed(0)}rb`;
-                                                    return formatRupiah(value);
-                                                }}
+                                                width={100}
+                                                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                                                tickFormatter={(value) => formatRupiah(value)}
                                             />
                                             {/* Average Reference Line */}
                                             {chartData.length > 1 && (

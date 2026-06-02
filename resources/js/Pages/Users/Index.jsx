@@ -80,7 +80,7 @@ export default function Index({ auth, users, filters }) {
                         </Badge>
                     </div>
 
-                    <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <form onSubmit={submit} className="grid md:grid-cols-4 gap-4">
                         <Input 
                             label="Nama Lengkap"
                             icon={User}
@@ -133,11 +133,12 @@ export default function Index({ auth, users, filters }) {
                         <table className="w-full text-sm text-slate-700 dark:text-slate-300 table-responsive-cards">
                             <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
                                 <tr>
-                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold w-16">No</th>
-                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold">User</th>
-                                    <th className="px-3 sm:px-6 py-4 text-left font-semibold hidden md:table-cell">Kontak</th>
-                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Role</th>
-                                    <th className="px-3 sm:px-6 py-4 text-center font-semibold">Aksi</th>
+                                    <th className="px-6 py-4 text-center font-semibold w-16">No</th>
+                                    <th className="px-6 py-4 text-left font-semibold">User</th>
+
+                                    <th className="px-6 py-4 text-center font-semibold">Role</th>
+                                    <th className="px-6 py-4 text-center font-semibold">Terdaftar</th>
+                                    <th className="px-6 py-4 text-center font-semibold">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
@@ -155,10 +156,7 @@ export default function Index({ auth, users, filters }) {
                                             </div>
                                         </td>
 
-                                        <td className="px-3 sm:px-6 py-4 text-left hidden md:table-cell text-xs text-slate-500 dark:text-slate-400">
-                                            {item.email}
-                                        </td>
-                                        <td className="px-3 sm:px-6 py-4 text-center" data-label="Role">
+                                        <td className="px-6 py-4 text-center">
                                             <Badge variant={item.role === 'admin' ? 'info' : 'slate'} icon={Shield}>
                                                 {item.role === 'admin' ? 'Administrator' : 'Kasir'}
                                             </Badge>

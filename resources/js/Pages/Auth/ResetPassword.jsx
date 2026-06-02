@@ -2,7 +2,8 @@ import InputError from '@/Components/InputError';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState, useMemo } from 'react';
+
 
 export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
