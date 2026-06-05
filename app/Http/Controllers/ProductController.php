@@ -46,9 +46,9 @@ class ProductController extends Controller
 
         $productData = [
             'name' => $validated['name'],
-            'stock' => $validated['stock'],
-            'price' => $validated['price'],
-            'cost_price' => $validated['cost_price'] ?? null,
+            'stock' => 0,
+            'price' => 0,
+            'cost_price' => null,
         ];
 
         if (!empty($validated['created_at'])) {
