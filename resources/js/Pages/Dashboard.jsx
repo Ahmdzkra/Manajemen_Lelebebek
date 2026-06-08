@@ -512,7 +512,8 @@ export default function Dashboard({
                                     {/* Chart Summary Stats */}
                                     {chartData.length > 0 && (() => {
                                         const total = chartData.reduce((s, d) => s + (d.sales || 0), 0);
-                                        const avg = Math.round(total / chartData.length);
+                                        const daysWithSales = chartData.filter(d => (d.sales || 0) > 0).length;
+                                        const avg = daysWithSales > 0 ? Math.round(total / daysWithSales) : 0;
                                         const peak = Math.max(...chartData.map(d => d.sales || 0));
                                         const peakDay = chartData.find(d => d.sales === peak);
                                         return (
@@ -578,15 +579,20 @@ export default function Dashboard({
                                                 tickFormatter={(value) => formatRupiah(value)}
                                             />
                                             {/* Average Reference Line */}
-                                            {chartData.length > 1 && (
-                                                <ReferenceLine
-                                                    y={Math.round(chartData.reduce((s, d) => s + (d.sales || 0), 0) / chartData.length)}
-                                                    stroke="#a5b4fc"
-                                                    strokeDasharray="5 4"
-                                                    strokeWidth={1.5}
-                                                    label={{ value: 'Rata-rata', fill: '#a5b4fc', fontSize: 10, fontWeight: 700, position: 'insideTopRight' }}
-                                                />
-                                            )}
+                                            {chartData.length > 1 && (() => {
+                                                const refTotal = chartData.reduce((s, d) => s + (d.sales || 0), 0);
+                                                const refDaysWithSales = chartData.filter(d => (d.sales || 0) > 0).length;
+                                                const refAvg = refDaysWithSales > 0 ? Math.round(refTotal / refDaysWithSales) : 0;
+                                                return (
+                                                    <ReferenceLine
+                                                        y={refAvg}
+                                                        stroke="#a5b4fc"
+                                                        strokeDasharray="5 4"
+                                                        strokeWidth={1.5}
+                                                        label={{ value: 'Rata-rata', fill: '#a5b4fc', fontSize: 10, fontWeight: 700, position: 'insideTopRight' }}
+                                                    />
+                                                );
+                                            })()}
                                             <Tooltip
                                                 cursor={{ stroke: '#6366f1', strokeWidth: 1.5, strokeDasharray: '4 3' }}
                                                 content={({ active, payload, label }) => {
