@@ -97,8 +97,10 @@ export default function Print({
     const saleRows = salesList.map((item) => ({
         key: item.id,
         date: formatDate(item.created_at),
-        product: item.product?.name || "-",
+        invoice: item.invoice_no,
+        product: item.product_name,
         qty: formatNumber(item.qty),
+        method: item.payment_method === "transfer" ? "Transfer" : "Tunai",
         total: formatRupiah(item.total),
     }));
 
@@ -156,11 +158,13 @@ export default function Print({
                 />
 
                 <MiniTable
-                    title="Penjualan Terbaru"
+                    title="Log Penjualan"
                     columns={[
                         { key: "date", label: "Tanggal" },
+                        { key: "invoice", label: "Invoice" },
                         { key: "product", label: "Produk" },
                         { key: "qty", label: "Qty", align: "center" },
+                        { key: "method", label: "Metode", align: "center" },
                         { key: "total", label: "Total", align: "right" },
                     ]}
                     rows={saleRows}

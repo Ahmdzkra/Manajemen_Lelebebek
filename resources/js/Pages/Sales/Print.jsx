@@ -181,8 +181,15 @@ export default function Print({ transaction, sale }) {
                         <span>{formatRupiah(receiptData.total)}</span>
                     </div>
 
+                    <div className="border-t border-dashed border-black/80 my-2"></div>
+
+                    <div className="flex justify-between">
+                        <span>Metode</span>
+                        <span className="font-bold">{receiptData.payment_method === 'transfer' ? 'CASHLESS (Transfer)' : 'TUNAI (Cash)'}</span>
+                    </div>
+
                     <div className="flex justify-between pt-0.5">
-                        <span>Bayar (Cash)</span>
+                        <span>Bayar</span>
                         <span>{formatRupiah(receiptData.pay_amount)}</span>
                     </div>
 
