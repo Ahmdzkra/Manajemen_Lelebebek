@@ -20,7 +20,16 @@ class RecordTransactionAction
             $calculatedSubtotal = 0;
             $itemsToProcess = [];
 
-            foreach ($data['items'] as $item) {
+            // Decode items if it is passed as a JSON string (due to FormData uploads)
+            $items = isset($data['items']) 
+                ? (is_string($data['items']) ? json_decode($data['items'], true) : $data['items']) 
+                : [];
+
+            if (!is_array($items)) {
+                throw new \InvalidArgumentException("Invalid format for items.");
+            }
+
+            foreach ($items as $item) {
                 $product = Product::lockForUpdate()->findOrFail($item['product_id']);
 
                 if ($product->stock < $item['qty']) {
@@ -61,6 +70,12 @@ class RecordTransactionAction
 
             $invoiceNo = 'INV-' . $today . '-' . str_pad($lastNumber, 4, '0', STR_PAD_LEFT);
 
+            // Handle uploading of the transfer proof file if present
+            $transferProofPath = null;
+            if (isset($data['transfer_proof']) && $data['transfer_proof'] instanceof \Illuminate\Http\UploadedFile) {
+                $transferProofPath = $data['transfer_proof']->store('transfer_proofs', 'public');
+            }
+
             $transaction = Transaction::create([
                 'invoice_no' => $invoiceNo,
                 'user_id' => Auth::id(),
@@ -71,6 +86,7 @@ class RecordTransactionAction
                 'pay_amount' => $payAmount,
                 'change_amount' => $changeAmount,
                 'payment_method' => $data['payment_method'] ?? 'cash',
+                'transfer_proof' => $transferProofPath,
                 'note' => $data['note'] ?? null,
             ]);
 

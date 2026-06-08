@@ -62,6 +62,8 @@ class DashboardController extends Controller
                     'product_name' => '-',
                     'qty'          => 0,
                     'total'        => (float) $t->total,
+                    'payment_method'=> $t->payment_method,
+                    'transfer_proof'=> $t->transfer_proof ? asset('storage/' . $t->transfer_proof) : null,
                     'created_at'   => $t->created_at,
                 ]];
             }
@@ -71,6 +73,8 @@ class DashboardController extends Controller
                 'product_name' => $d->product?->name ?? '-',
                 'qty'          => (int) $d->qty,
                 'total'        => (float) $d->subtotal,
+                'payment_method'=> $t->payment_method,
+                'transfer_proof'=> $t->transfer_proof ? asset('storage/' . $t->transfer_proof) : null,
                 'created_at'   => $t->created_at,
             ]);
         });
@@ -82,6 +86,8 @@ class DashboardController extends Controller
             'product_name' => $s->product?->name ?? '-',
             'qty'          => (int) $s->qty,
             'total'        => (float) $s->total,
+            'payment_method'=> 'cash',
+            'transfer_proof'=> null,
             'created_at'   => $s->created_at,
         ]);
 

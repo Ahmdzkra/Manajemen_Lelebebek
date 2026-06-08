@@ -14,7 +14,10 @@ import {
     CheckCircle2,
     Package,
     ChevronRight,
-    SearchX
+    SearchX,
+    Upload,
+    ImageIcon,
+    FileCheck2
 } from "lucide-react";
 import Card from '@/Components/UI/Card';
 import Button from '@/Components/UI/Button';
@@ -36,6 +39,8 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
     const [showCheckout, setShowCheckout] = useState(false);
     const [payAmount, setPayAmount] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('cash');
+    const [transferProof, setTransferProof] = useState(null);
+    const [transferProofPreview, setTransferProofPreview] = useState(null);
 
     useEffect(() => {
         if (flash?.print_id) {
@@ -102,24 +107,46 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
     const total = subtotal + tax;
     const change = payAmount ? Math.max(0, payAmount - total) : 0;
 
+    const handleTransferProofChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setTransferProof(file);
+        const reader = new FileReader();
+        reader.onloadend = () => setTransferProofPreview(reader.result);
+        reader.readAsDataURL(file);
+    };
+
+    const isCashless = paymentMethod === 'transfer';
+
     const handleCheckout = (e) => {
         e.preventDefault();
-        if (payAmount < total) return;
+        if (!isCashless && payAmount < total) return;
+        if (isCashless && !transferProof) return;
 
-        router.post('/sales', {
-            items: cart.map(item => ({ product_id: item.id, qty: item.qty, price: item.price })),
-            subtotal,
-            tax,
-            total,
-            pay_amount: payAmount,
-            change_amount: change,
-            payment_method: paymentMethod,
-        }, {
+        const formData = new FormData();
+        formData.append('items', JSON.stringify(cart.map(item => ({ product_id: item.id, qty: item.qty, price: item.price }))));
+        formData.append('subtotal', subtotal);
+        formData.append('tax', tax);
+        formData.append('total', total);
+        formData.append('payment_method', paymentMethod);
+        if (!isCashless) {
+            formData.append('pay_amount', payAmount);
+            formData.append('change_amount', change);
+        } else {
+            formData.append('pay_amount', total);
+            formData.append('change_amount', 0);
+            if (transferProof) formData.append('transfer_proof', transferProof);
+        }
+
+        router.post('/sales', formData, {
+            forceFormData: true,
             onSuccess: () => {
                 setCart([]);
                 localStorage.removeItem('pos_cart');
                 setShowCheckout(false);
                 setPayAmount('');
+                setTransferProof(null);
+                setTransferProofPreview(null);
             }
         });
     };
@@ -290,7 +317,7 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
 
                         <div className="grid grid-cols-2 gap-4">
                             <button
-                                onClick={() => setPaymentMethod('cash')}
+                                onClick={() => { setPaymentMethod('cash'); setTransferProof(null); setTransferProofPreview(null); }}
                                 className={`flex flex-col items-center justify-center gap-2 p-5 rounded-[2rem] border-2 transition-all duration-300 font-bold ${paymentMethod === 'cash'
                                     ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-4 ring-indigo-600/10'
                                     : 'border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 hover:border-indigo-200 dark:hover:border-indigo-500/30 hover:bg-white dark:hover:bg-slate-700/50'
@@ -302,32 +329,36 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
                                 <span className="text-sm">Tunai / Cash</span>
                             </button>
                             <button
-                                onClick={() => setPaymentMethod('transfer')}
+                                onClick={() => { setPaymentMethod('transfer'); setPayAmount(''); }}
                                 className={`flex flex-col items-center justify-center gap-2 p-5 rounded-[2rem] border-2 transition-all duration-300 font-bold ${paymentMethod === 'transfer'
-                                    ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-4 ring-indigo-600/10'
-                                    : 'border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 hover:border-indigo-200 dark:hover:border-indigo-500/30 hover:bg-white dark:hover:bg-slate-700/50'
+                                    ? 'border-violet-600 bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 ring-4 ring-violet-600/10'
+                                    : 'border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 hover:border-violet-200 dark:hover:border-violet-500/30 hover:bg-white dark:hover:bg-slate-700/50'
                                     }`}
                             >
-                                <div className={`p-3 rounded-2xl transition-colors ${paymentMethod === 'transfer' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}>
+                                <div className={`p-3 rounded-2xl transition-colors ${paymentMethod === 'transfer' ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/30' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}>
                                     <CreditCard className="w-6 h-6" />
                                 </div>
                                 <span className="text-sm">Transfer Bank</span>
                             </button>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Nominal Pembayaran</label>
-                            <Input
-                                type="number"
-                                placeholder="Masukkan Nominal Pembayaran..."
-                                value={payAmount}
-                                onChange={(e) => setPayAmount(e.target.value)}
-                                className="text-xl font-bold py-5 text-center tracking-tight"
-                                autoFocus
-                            />
-                        </div>
+                        {/* --- CASH: Input Nominal --- */}
+                        {!isCashless && (
+                            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Nominal Pembayaran</label>
+                                <Input
+                                    type="number"
+                                    placeholder="Masukkan Nominal Pembayaran..."
+                                    value={payAmount}
+                                    onChange={(e) => setPayAmount(e.target.value)}
+                                    className="text-xl font-bold py-5 text-center tracking-tight"
+                                    autoFocus
+                                />
+                            </div>
+                        )}
 
-                        {payAmount >= total && (
+                        {/* --- CASH: Uang Kembalian --- */}
+                        {!isCashless && payAmount >= total && (
                             <div className="p-5 bg-emerald-50 dark:bg-emerald-500/10 rounded-[1.5rem] border border-emerald-200 dark:border-emerald-500/20 flex justify-between items-center animate-in fade-in slide-in-from-top-2 group">
                                 <div>
                                     <span className="text-emerald-700 dark:text-emerald-400 font-bold text-sm block">Uang Kembalian</span>
@@ -339,10 +370,68 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
                             </div>
                         )}
 
+                        {/* --- CASHLESS: Upload Bukti Pembayaran --- */}
+                        {isCashless && (
+                            <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <label className="text-xs font-bold text-violet-500 dark:text-violet-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                                    <Upload className="w-3.5 h-3.5" />
+                                    Bukti Pembayaran Transfer
+                                </label>
+
+                                {/* Preview area */}
+                                {transferProofPreview ? (
+                                    <div className="relative rounded-2xl overflow-hidden border-2 border-violet-400 dark:border-violet-500 bg-violet-50 dark:bg-violet-900/20 shadow-lg shadow-violet-500/10">
+                                        <img
+                                            src={transferProofPreview}
+                                            alt="Bukti Transfer"
+                                            className="w-full max-h-48 object-contain"
+                                        />
+                                        <div className="absolute top-2 right-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => { setTransferProof(null); setTransferProofPreview(null); }}
+                                                className="bg-rose-500 text-white rounded-full p-1.5 shadow-lg hover:bg-rose-600 transition-colors"
+                                            >
+                                                <X className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                        <div className="p-3 bg-violet-600/10 dark:bg-violet-900/40 flex items-center gap-2">
+                                            <FileCheck2 className="w-4 h-4 text-violet-600 dark:text-violet-400 shrink-0" />
+                                            <span className="text-xs font-semibold text-violet-700 dark:text-violet-300 truncate">{transferProof?.name}</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <label
+                                        htmlFor="transfer-proof-input"
+                                        className="flex flex-col items-center justify-center gap-3 w-full p-6 rounded-2xl border-2 border-dashed border-violet-300 dark:border-violet-600/50 bg-violet-50/50 dark:bg-violet-900/10 hover:bg-violet-100 dark:hover:bg-violet-900/20 hover:border-violet-500 dark:hover:border-violet-500 transition-all duration-300 cursor-pointer group"
+                                    >
+                                        <div className="p-4 rounded-2xl bg-violet-100 dark:bg-violet-800/30 text-violet-500 dark:text-violet-400 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                                            <ImageIcon className="w-7 h-7" />
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-sm font-bold text-violet-600 dark:text-violet-400">Klik untuk upload foto / file</p>
+                                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Screenshot, foto struk, atau bukti transfer</p>
+                                        </div>
+                                        <input
+                                            id="transfer-proof-input"
+                                            type="file"
+                                            accept="image/*,.pdf"
+                                            className="hidden"
+                                            onChange={handleTransferProofChange}
+                                        />
+                                    </label>
+                                )}
+                            </div>
+                        )}
+
                         <Button
                             onClick={handleCheckout}
-                            disabled={payAmount < total}
-                            className="w-full py-5 text-xl font-black shadow-2xl shadow-indigo-600/40 rounded-[1.5rem]"
+                            disabled={isCashless ? !transferProof : payAmount < total}
+                            className={`w-full py-5 text-xl font-black rounded-[1.5rem] shadow-2xl ${
+                                isCashless
+                                    ? 'shadow-violet-600/40 bg-violet-600 hover:bg-violet-700'
+                                    : 'shadow-indigo-600/40'
+                            }`}
                             icon={CheckCircle2}
                         >
                             Konfirmasi Transaksi

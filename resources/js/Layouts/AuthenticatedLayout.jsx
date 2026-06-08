@@ -62,6 +62,9 @@ export default function AuthenticatedLayout({ user, children }) {
     const isProductsActive = url.startsWith('/products') || url.startsWith('/master-products');
     const [isProductsOpen, setIsProductsOpen] = useState(isProductsActive);
 
+    const isSalesActive = url.startsWith('/sales');
+    const [isSalesOpen, setIsSalesOpen] = useState(isSalesActive);
+
     // Close sidebar on route change on mobile
     useEffect(() => {
         setIsSidebarOpen(false);
@@ -222,9 +225,16 @@ export default function AuthenticatedLayout({ user, children }) {
                                     Business Flow
                                 </p>
                                 <div className="space-y-1.5">
-                                    <MenuItem href="/sales" icon={ShoppingCart}>
-                                        Penjualan
-                                    </MenuItem>
+                                    <MenuDropdown
+                                        title="Penjualan"
+                                        icon={ShoppingCart}
+                                        isOpen={isSalesOpen}
+                                        onToggle={() => setIsSalesOpen(!isSalesOpen)}
+                                        isActive={isSalesActive}
+                                    >
+                                        <SubMenuItem href="/sales">POS (Point of Sale)</SubMenuItem>
+                                        <SubMenuItem href="/sales/history">Riwayat Penjualan</SubMenuItem>
+                                    </MenuDropdown>
                                     <MenuItem href="/suppliers" icon={Truck}>
                                         Supplier
                                     </MenuItem>
@@ -259,9 +269,16 @@ export default function AuthenticatedLayout({ user, children }) {
                                     <MenuItem href="/dashboard" icon={LayoutDashboard}>
                                         Dashboard
                                     </MenuItem>
-                                    <MenuItem href="/sales" icon={ShoppingCart}>
-                                        Terminal POS
-                                    </MenuItem>
+                                    <MenuDropdown
+                                        title="Penjualan"
+                                        icon={ShoppingCart}
+                                        isOpen={isSalesOpen}
+                                        onToggle={() => setIsSalesOpen(!isSalesOpen)}
+                                        isActive={isSalesActive}
+                                    >
+                                        <SubMenuItem href="/sales">POS (Point of Sale)</SubMenuItem>
+                                        <SubMenuItem href="/sales/history">Riwayat Penjualan</SubMenuItem>
+                                    </MenuDropdown>
                                 </div>
                             </div>
                         </>

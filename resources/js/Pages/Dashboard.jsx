@@ -17,7 +17,8 @@ import {
     Sparkles,
     AlertCircle,
     Bell,
-    Calendar
+    Calendar,
+    ExternalLink
 } from "lucide-react";
 import CardUI from '@/Components/UI/Card';
 import Badge from '@/Components/UI/Badge';
@@ -143,6 +144,7 @@ function SalesTable({ latestSales = [], formatRupiah }) {
                             <th className="px-5 py-4 text-left font-semibold">Waktu</th>
                             <th className="px-5 py-4 text-left font-semibold">Nama Produk</th>
                             <th className="px-5 py-4 text-center font-semibold">Quantity</th>
+                            <th className="px-5 py-4 text-center font-semibold">Metode</th>
                             <th className="px-5 py-4 text-right font-semibold">Total</th>
                         </tr>
                     </thead>
@@ -181,6 +183,31 @@ function SalesTable({ latestSales = [], formatRupiah }) {
                                             </span>
                                         </td>
 
+                                        {/* Metode Pembayaran */}
+                                        <td className="px-5 py-3.5 text-center">
+                                            {item.payment_method === 'transfer' ? (
+                                                <div className="flex flex-col items-center gap-1">
+                                                    <span className="bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                                        Transfer
+                                                    </span>
+                                                    {item.transfer_proof && (
+                                                        <a
+                                                            href={item.transfer_proof}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-[10px] text-indigo-600 dark:text-indigo-400 font-black hover:underline flex items-center gap-0.5"
+                                                        >
+                                                            Bukti <ExternalLink className="w-2.5 h-2.5" />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <span className="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                                    Tunai
+                                                </span>
+                                            )}
+                                        </td>
+
                                         {/* Total */}
                                         <td className="px-5 py-3.5 text-right">
                                             <span className="font-bold text-emerald-600 dark:text-emerald-400">
@@ -192,7 +219,7 @@ function SalesTable({ latestSales = [], formatRupiah }) {
                             })
                         ) : (
                             <tr>
-                                <td colSpan="5" className="px-6 py-12 text-center">
+                                <td colSpan="6" className="px-6 py-12 text-center">
                                     <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
                                         <ShoppingCart className="w-12 h-12 mb-3 opacity-20" />
                                         <p className="font-medium">Belum ada data penjualan</p>
