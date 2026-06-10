@@ -86,7 +86,7 @@ class SaleController extends Controller
             });
         }
 
-        $transactions = $query->latest()->paginate(15)->withQueryString();
+        $transactions = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('Sales/History', [
             'transactions' => $transactions,
