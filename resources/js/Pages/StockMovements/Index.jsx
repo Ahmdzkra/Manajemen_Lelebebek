@@ -8,7 +8,17 @@ import Badge from '@/Components/UI/Badge';
 
 export default function Index({ auth, movements, filters = {} }) {
     const [search, setSearch] = useState(filters.search || '');
+    const [startDate, setStartDate] = useState(filters.start_date || '');
+    const [endDate, setEndDate] = useState(filters.end_date || '');
     const searchTimeout = useRef(null);
+
+    const applyFilters = (currentSearch, start, end) => {
+        router.get(
+            '/stock-movements',
+            { search: currentSearch, start_date: start, end_date: end },
+            { preserveState: true, preserveScroll: true, replace: true }
+        );
+    };
 
     const onSearchChange = (e) => {
         const value = e.target.value;
@@ -17,12 +27,27 @@ export default function Index({ auth, movements, filters = {} }) {
         if (searchTimeout.current) clearTimeout(searchTimeout.current);
 
         searchTimeout.current = setTimeout(() => {
-            router.get(
-                '/stock-movements',
-                { search: value },
-                { preserveState: true, preserveScroll: true, replace: true }
-            );
+            applyFilters(value, startDate, endDate);
         }, 300);
+    };
+
+    const handleStartDateChange = (e) => {
+        const val = e.target.value;
+        setStartDate(val);
+        applyFilters(search, val, endDate);
+    };
+
+    const handleEndDateChange = (e) => {
+        const val = e.target.value;
+        setEndDate(val);
+        applyFilters(search, startDate, val);
+    };
+
+    const handleReset = () => {
+        setSearch('');
+        setStartDate('');
+        setEndDate('');
+        applyFilters('', '', '');
     };
 
     const getTypeBadge = (type) => {
@@ -60,7 +85,7 @@ export default function Index({ auth, movements, filters = {} }) {
 
                 {/* Table */}
                 <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/60 overflow-hidden transition-colors duration-300">
-                    <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                         <div className="flex items-center justify-between sm:justify-start gap-4">
                             <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
                                 Riwayat Pergerakan
@@ -70,17 +95,52 @@ export default function Index({ auth, movements, filters = {} }) {
                             </span>
                         </div>
                         
-                        <div className="relative w-full sm:w-64 lg:w-80 group">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                <Search className="w-4 h-4" />
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full xl:w-auto">
+                            {/* Date Filters */}
+                            <div className="flex items-center gap-2">
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap uppercase tracking-wider">
+                                    Filter Tanggal:
+                                </label>
+                                <input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={handleStartDateChange}
+                                    className="px-3 py-1.5 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-xs font-semibold"
+                                />
+                                <span className="text-slate-400 text-xs">s/d</span>
+                                <input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={handleEndDateChange}
+                                    className="px-3 py-1.5 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-xs font-semibold"
+                                />
                             </div>
-                            <input
-                                type="text"
-                                placeholder="Cari nama produk atau keterangan..."
-                                value={search}
-                                onChange={onSearchChange}
-                                className="block w-full pl-10 pr-4 py-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-sm placeholder:text-slate-400"
-                            />
+
+                            {/* Search and Reset */}
+                            <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                                <div className="relative group flex-1 sm:w-60">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                                        <Search className="w-4 h-4" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Cari produk / keterangan..."
+                                        value={search}
+                                        onChange={onSearchChange}
+                                        className="block w-full pl-10 pr-4 py-1.5 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-xs placeholder:text-slate-400 font-semibold"
+                                    />
+                                </div>
+                                
+                                {(search || startDate || endDate) && (
+                                    <button
+                                        type="button"
+                                        onClick={handleReset}
+                                        className="px-3 py-1.5 text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-xl transition-colors whitespace-nowrap"
+                                    >
+                                        Reset
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
