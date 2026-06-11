@@ -34,6 +34,13 @@ class SaleController extends Controller
 
     public function store(Request $request, RecordTransactionAction $recordTransaction)
     {
+        $request->validate([
+            'transfer_proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
+        ], [
+            'transfer_proof.mimes' => 'Bukti transfer harus berformat JPG, JPEG, atau PNG.',
+            'transfer_proof.max' => 'Ukuran file maksimal 5MB.',
+        ]);
+
         $transaction = $recordTransaction->handle($request->all());
 
         return redirect()

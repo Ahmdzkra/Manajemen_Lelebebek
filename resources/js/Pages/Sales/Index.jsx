@@ -110,6 +110,14 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
     const handleTransferProofChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Format file tidak didukung. Hanya file JPG, JPEG, dan PNG yang diperbolehkan.');
+            e.target.value = '';
+            return;
+        }
+
         setTransferProof(file);
         const reader = new FileReader();
         reader.onloadend = () => setTransferProofPreview(reader.result);
@@ -410,12 +418,12 @@ export default function Index({ auth, products = [], recentTransactions = [], fi
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm font-bold text-violet-600 dark:text-violet-400">Klik untuk upload foto / file</p>
-                                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Screenshot, foto struk, atau bukti transfer</p>
+                                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Format yang didukung: JPG, JPEG, PNG</p>
                                         </div>
                                         <input
                                             id="transfer-proof-input"
                                             type="file"
-                                            accept="image/*,.pdf"
+                                            accept=".jpg,.jpeg,.png"
                                             className="hidden"
                                             onChange={handleTransferProofChange}
                                         />

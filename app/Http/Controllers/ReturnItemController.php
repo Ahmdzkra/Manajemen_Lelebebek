@@ -11,14 +11,28 @@ use Inertia\Inertia;
 
 class ReturnItemController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $query = ReturnItem::with('product', 'supplier')->latest();
+
+        if ($startDate) {
+            $query->where('date', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->where('date', '<=', $endDate);
+        }
+
         return Inertia::render('Returns/Index', [
             'products' => Product::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
-            'returns' => ReturnItem::with('product', 'supplier')
-                ->latest()
-                ->paginate(10),
+            'returns' => $query->paginate(10)->withQueryString(),
+            'filters' => [
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ],
         ]);
     }
 

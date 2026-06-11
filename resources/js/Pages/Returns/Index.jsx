@@ -1,5 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
+import React from 'react';
+import { Head, useForm, router } from "@inertiajs/react";
 import { todayDate, formatDate } from "@/utils/formatters";
 import { RotateCcw, AlertCircle, FileText, Truck, Package, AlertTriangle, MessageSquare, CheckCircle2, Calendar } from "lucide-react";
 import Card from '@/Components/UI/Card';
@@ -15,6 +16,7 @@ export default function Index({
     products = [],
     suppliers = [],
     returns = [],
+    filters = {},
 }) {
     const { data, setData, post, reset, errors } = useForm({
         supplier_id: "",
@@ -23,6 +25,35 @@ export default function Index({
         reason: "",
         date: todayDate(),
     });
+
+    const [startDate, setStartDate] = React.useState(filters?.start_date || '');
+    const [endDate, setEndDate] = React.useState(filters?.end_date || '');
+
+    const applyFilter = (start, end) => {
+        router.get(
+            '/returns',
+            { start_date: start, end_date: end },
+            { preserveState: true, preserveScroll: true, replace: true }
+        );
+    };
+
+    const handleStartDateChange = (e) => {
+        const val = e.target.value;
+        setStartDate(val);
+        applyFilter(val, endDate);
+    };
+
+    const handleEndDateChange = (e) => {
+        const val = e.target.value;
+        setEndDate(val);
+        applyFilter(startDate, val);
+    };
+
+    const handleReset = () => {
+        setStartDate('');
+        setEndDate('');
+        applyFilter('', '');
+    };
 
     const selectedProduct = products.find(
         (item) => item.id == data.product_id
@@ -209,13 +240,45 @@ export default function Index({
 
                 {/* Table */}
                 <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/60 overflow-hidden transition-colors duration-300">
-                    <div className="p-6 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
-                        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-                            Riwayat Retur
-                        </h2>
-                        <span className="px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold">
-                            {returns.total || 0} data
-                        </span>
+                    <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                                Riwayat Retur
+                            </h2>
+                            <span className="px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold">
+                                {returns.total || 0} data
+                            </span>
+                        </div>
+                        
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div className="flex items-center gap-2">
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap uppercase tracking-wider">
+                                    Filter Tanggal:
+                                </label>
+                                <input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={handleStartDateChange}
+                                    className="px-3 py-1.5 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 text-xs font-semibold"
+                                />
+                                <span className="text-slate-400 text-xs">s/d</span>
+                                <input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={handleEndDateChange}
+                                    className="px-3 py-1.5 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 text-xs font-semibold"
+                                />
+                            </div>
+                            {(startDate || endDate) && (
+                                <button
+                                    type="button"
+                                    onClick={handleReset}
+                                    className="px-3 py-1.5 text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-xl transition-colors whitespace-nowrap"
+                                >
+                                    Reset
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto">
