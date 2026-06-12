@@ -48,41 +48,7 @@ function Card({ title, value, icon: Icon, color = "text-slate-800 dark:text-slat
     );
 }
 
-function CustomYearSelect({ value, onChange, options, className }) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef(null);
-    useEffect(() => {
-        const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
-    return (
-        <div ref={ref} className={`relative ${className}`}>
-            <button
-                type="button"
-                onClick={(e) => { e.preventDefault(); setOpen(!open); }}
-                className="w-full h-full text-xs rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 focus:ring-indigo-500 focus:border-indigo-500 py-2 pl-3 pr-2 text-left flex justify-between items-center"
-            >
-                <span>{value}</span>
-                <ChevronRight className={`w-3 h-3 transition-transform ${open ? 'rotate-90' : ''}`} />
-            </button>
-            {open && (
-                <div className="absolute z-[60] top-full mt-1 right-0 w-full min-w-[4.5rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-[12.5rem] overflow-y-auto">
-                    {options.map((opt) => (
-                        <button
-                            key={opt}
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); onChange(opt); setOpen(false); }}
-                            className={`w-full text-left px-3 py-2 text-xs hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors ${value == opt ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-slate-300'}`}
-                        >
-                            {opt}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
+
 
 // Palet warna unik per nama produk
 const PRODUCT_COLOR_PALETTE = [
@@ -282,39 +248,21 @@ export default function Dashboard({
     const { auth } = usePage().props;
     const user = auth?.user;
 
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: currentYear - 2000 + 1 }, (_, i) => currentYear - i);
-    const months = [
-        { value: '01', label: 'Januari' },
-        { value: '02', label: 'Februari' },
-        { value: '03', label: 'Maret' },
-        { value: '04', label: 'April' },
-        { value: '05', label: 'Mei' },
-        { value: '06', label: 'Juni' },
-        { value: '07', label: 'Juli' },
-        { value: '08', label: 'Agustus' },
-        { value: '09', label: 'September' },
-        { value: '10', label: 'Oktober' },
-        { value: '11', label: 'November' },
-        { value: '12', label: 'Desember' },
-    ];
+
 
     const [showFilter, setShowFilter] = useState(false);
 
-    const initStartMonth = currentStart ? currentStart.split('-')[1] : "01";
-    const initStartYear = currentStart ? currentStart.split('-')[0] : currentYear.toString();
-    const initEndMonth = currentEnd ? currentEnd.split('-')[1] : "12";
-    const initEndYear = currentEnd ? currentEnd.split('-')[0] : currentYear.toString();
 
-    const [startMonth, setStartMonth] = useState(initStartMonth);
-    const [startYear, setStartYear] = useState(initStartYear);
-    const [endMonth, setEndMonth] = useState(initEndMonth);
-    const [endYear, setEndYear] = useState(initEndYear);
 
-    const applyCustomFilter = () => {
-        const customStart = `${startYear}-${startMonth}`;
-        const customEnd = `${endYear}-${endMonth}`;
-        router.get('/dashboard', { period: 'custom_month', start: customStart, end: customEnd }, { preserveState: true, preserveScroll: true });
+    const isCustomDate = currentPeriod === 'custom_date';
+    const [startDate, setStartDate] = useState(isCustomDate ? currentStart : '');
+    const [endDate, setEndDate] = useState(isCustomDate ? currentEnd : '');
+
+
+
+    const applyCustomDateFilter = () => {
+        if (!startDate || !endDate) return;
+        router.get('/dashboard', { period: 'custom_date', start: startDate, end: endDate }, { preserveState: true, preserveScroll: true });
         setShowFilter(false);
     }
 
@@ -502,33 +450,29 @@ export default function Dashboard({
 
                                                         <hr className="border-slate-100 dark:border-slate-700" />
 
-                                                        {/* Bulan */}
+                                                        {/* Tanggal */}
                                                         <div>
-                                                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Bulan</p>
+                                                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Tanggal</p>
                                                             <div className="space-y-3">
                                                                 <div className="flex flex-col gap-2">
                                                                     {/* Start Date */}
                                                                     <div className="flex items-center gap-2">
                                                                         <span className="text-xs text-slate-500 font-medium w-8 shrink-0">Dari:</span>
-                                                                        <select value={startMonth} onChange={(e) => setStartMonth(e.target.value)} className="w-full min-w-0 text-xs rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 focus:ring-indigo-500 focus:border-indigo-500 py-2 pr-8">
-                                                                            {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                                                                        </select>
-                                                                        <CustomYearSelect value={startYear} onChange={setStartYear} options={years} className="w-[5.5rem] shrink-0" />
+                                                                        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full min-w-0 text-xs rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 focus:ring-indigo-500 focus:border-indigo-500 py-2 px-3" />
                                                                     </div>
                                                                     {/* End Date */}
                                                                     <div className="flex items-center gap-2">
                                                                         <span className="text-xs text-slate-500 font-medium w-8 shrink-0">s/d:</span>
-                                                                        <select value={endMonth} onChange={(e) => setEndMonth(e.target.value)} className="w-full min-w-0 text-xs rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 focus:ring-indigo-500 focus:border-indigo-500 py-2 pr-8">
-                                                                            {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                                                                        </select>
-                                                                        <CustomYearSelect value={endYear} onChange={setEndYear} options={years} className="w-[5.5rem] shrink-0" />
+                                                                        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full min-w-0 text-xs rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 focus:ring-indigo-500 focus:border-indigo-500 py-2 px-3" />
                                                                     </div>
                                                                 </div>
-                                                                <button onClick={applyCustomFilter} className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 shadow-sm hover:shadow-indigo-600/20 transition-all">
+                                                                <button onClick={applyCustomDateFilter} disabled={!startDate || !endDate} className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 shadow-sm hover:shadow-indigo-600/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                                                     Terapkan
                                                                 </button>
                                                             </div>
                                                         </div>
+
+
                                                     </div>
                                                 </div>
                                             </>

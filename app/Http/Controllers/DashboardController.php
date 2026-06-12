@@ -100,7 +100,7 @@ class DashboardController extends Controller
     private function getChartData(string $period, ?string $start = null, ?string $end = null): array
     {
         return match ($period) {
-            'custom_month' => $this->getCustomMonthData($start, $end),
+            'custom_date' => $this->getCustomDateData($start, $end),
             '7days'   => $this->getDailyData(7),
             '14days'  => $this->getDailyData(14),
             '30days'  => $this->getDailyData(30),
@@ -188,13 +188,13 @@ class DashboardController extends Controller
         })->filter()->values()->toArray();
     }
 
-    private function getCustomMonthData(?string $start, ?string $end): array
+    private function getCustomDateData(?string $start, ?string $end): array
     {
         if (!$start || !$end) return $this->getDailyData(7);
 
         try {
-            $startDate = Carbon::createFromFormat('Y-m', $start)->startOfMonth();
-            $endDate = Carbon::createFromFormat('Y-m', $end)->endOfMonth();
+            $startDate = Carbon::parse($start)->startOfDay();
+            $endDate = Carbon::parse($end)->endOfDay();
         } catch (\Exception $e) {
             return $this->getDailyData(7);
         }
@@ -203,18 +203,17 @@ class DashboardController extends Controller
         $currentDate = clone $startDate;
 
         while ($currentDate <= $endDate) {
-            $year = $currentDate->year;
-            $month = $currentDate->month;
+            $dateStr = $currentDate->toDateString();
 
             $data[] = [
-                'date' => $currentDate->translatedFormat('M Y'),
+                'date' => $currentDate->translatedFormat('d M'),
                 'sales' => (float) (
-                    Transaction::whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('total')
-                    + Sale::whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('total')
+                    Transaction::whereDate('created_at', $dateStr)->sum('total')
+                    + Sale::whereDate('created_at', $dateStr)->sum('total')
                 ),
             ];
 
-            $currentDate->addMonth();
+            $currentDate->addDay();
         }
 
         return $data;
