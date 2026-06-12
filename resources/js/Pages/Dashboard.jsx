@@ -76,17 +76,27 @@ function getProductColor(name, colorMap) {
 
 const PAGE_SIZE = 10;
 
-function SalesTable({ latestSales = [], formatRupiah }) {
+function SalesTable({ latestSales = [], formatRupiah, currentPeriod = '7days', currentStart = '', currentEnd = '' }) {
     const [page, setPage] = useState(0);
+    const [showFilter, setShowFilter] = useState(false);
+    const [startDate, setStartDate] = useState(currentStart);
+    const [endDate, setEndDate] = useState(currentEnd);
+
     const totalPages = Math.ceil(latestSales.length / PAGE_SIZE);
     const colorMap = {};
+
+    const applyCustomDateFilter = () => {
+        if (!startDate || !endDate) return;
+        router.get('/dashboard', { period: 'custom_date', start: startDate, end: endDate }, { preserveState: true, preserveScroll: true });
+        setShowFilter(false);
+    }
 
     const paginated = latestSales.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg shadow-slate-200/50 dark:shadow-none overflow-hidden border border-slate-100 dark:border-slate-700 transition-colors duration-300">
             {/* Header */}
-            <div className="p-6 border-b border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 flex items-center justify-between">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-xl">
                         <Activity className="w-5 h-5" />
@@ -96,9 +106,89 @@ function SalesTable({ latestSales = [], formatRupiah }) {
                         <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{latestSales.length} total transaksi</p>
                     </div>
                 </div>
-                <Link href="/sales" className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 group">
-                    Lihat Semua <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                <div className="flex items-center gap-3">
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowFilter(!showFilter)}
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer focus:ring-2 focus:ring-indigo-500/50"
+                        >
+                            <Calendar className="w-4 h-4" />
+                            Filter Periode
+                        </button>
+
+                        {showFilter && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowFilter(false)}></div>
+                                <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 z-50 p-4 animate-in fade-in slide-in-from-top-2">
+                                    <div className="space-y-4">
+                                        {/* Harian */}
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Harian</p>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <button onClick={() => { router.get('/dashboard', { period: '7days' }, { preserveState: true, preserveScroll: true }); setShowFilter(false); }} className={`px-2 py-2 rounded-xl text-xs font-bold transition-all ${currentPeriod === '7days' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>7 Hari</button>
+                                                <button onClick={() => { router.get('/dashboard', { period: '14days' }, { preserveState: true, preserveScroll: true }); setShowFilter(false); }} className={`px-2 py-2 rounded-xl text-xs font-bold transition-all ${currentPeriod === '14days' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>14 Hari</button>
+                                                <button onClick={() => { router.get('/dashboard', { period: '30days' }, { preserveState: true, preserveScroll: true }); setShowFilter(false); }} className={`px-2 py-2 rounded-xl text-xs font-bold transition-all ${currentPeriod === '30days' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>30 Hari</button>
+                                            </div>
+                                        </div>
+
+                                        <hr className="border-slate-100 dark:border-slate-700" />
+
+                                        {/* Hari Tertentu */}
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Hari Tertentu</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {[
+                                                    { val: 'day_0', label: 'Senin' },
+                                                    { val: 'day_1', label: 'Selasa' },
+                                                    { val: 'day_2', label: 'Rabu' },
+                                                    { val: 'day_3', label: 'Kamis' },
+                                                    { val: 'day_4', label: 'Jumat' },
+                                                    { val: 'day_5', label: 'Sabtu' },
+                                                    { val: 'day_6', label: 'Minggu' }
+                                                ].map((day) => (
+                                                    <button
+                                                        key={day.val}
+                                                        onClick={() => { router.get('/dashboard', { period: day.val }, { preserveState: true, preserveScroll: true }); setShowFilter(false); }}
+                                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${currentPeriod === day.val ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                                    >
+                                                        {day.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <hr className="border-slate-100 dark:border-slate-700" />
+
+                                        {/* Tanggal */}
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Tanggal</p>
+                                            <div className="space-y-3">
+                                                <div className="flex flex-col gap-2">
+                                                    {/* Start Date */}
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-slate-500 font-medium w-8 shrink-0">Dari:</span>
+                                                        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full min-w-0 text-xs rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 focus:ring-indigo-500 focus:border-indigo-500 py-2 px-3" />
+                                                    </div>
+                                                    {/* End Date */}
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-slate-500 font-medium w-8 shrink-0">s/d:</span>
+                                                        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full min-w-0 text-xs rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 focus:ring-indigo-500 focus:border-indigo-500 py-2 px-3" />
+                                                    </div>
+                                                </div>
+                                                <button onClick={applyCustomDateFilter} disabled={!startDate || !endDate} className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 shadow-sm hover:shadow-indigo-600/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                                    Terapkan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <Link href="/sales" className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 group">
+                        Lihat Semua <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                </div>
             </div>
 
             {/* Table */}
@@ -601,6 +691,9 @@ export default function Dashboard({
                         <SalesTable
                             latestSales={latestSales}
                             formatRupiah={formatRupiah}
+                            currentPeriod={currentPeriod}
+                            currentStart={currentStart}
+                            currentEnd={currentEnd}
                         />
                     </>
                 )}
@@ -659,6 +752,9 @@ export default function Dashboard({
                         <SalesTable
                             latestSales={latestSales}
                             formatRupiah={formatRupiah}
+                            currentPeriod={currentPeriod}
+                            currentStart={currentStart}
+                            currentEnd={currentEnd}
                         />
                     </>
                 )}

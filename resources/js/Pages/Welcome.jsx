@@ -53,13 +53,6 @@ export default function Welcome({ auth }) {
                         </span>
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-10 font-bold text-base text-[#4A554E] dark:text-slate-300">
-                        <span className="text-[#85A059] relative after:content-[''] after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-1 after:bg-[#85A059] after:rounded-full cursor-pointer">Beranda</span>
-                        <span className="hover:text-[#85A059] transition-colors cursor-pointer">Produk</span>
-                        <span className="hover:text-[#85A059] transition-colors cursor-pointer">Keunggulan</span>
-                        <span className="hover:text-[#85A059] transition-colors cursor-pointer">Kontak</span>
-                    </div>
-
                     <div className="flex items-center gap-4">
                         <button
                             onClick={toggleTheme}
